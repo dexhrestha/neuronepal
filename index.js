@@ -52,7 +52,7 @@ async function main() {
     // Three.js settings
     orthographic: true,
     cssScene: true,
-
+    demo: true,
     // Scene quantities
     // Assume meters and seconds for three.js, but note tween.js uses milliseconds
     cursorRadius: 0.002,
