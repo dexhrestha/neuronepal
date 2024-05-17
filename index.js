@@ -48,6 +48,7 @@ async function main() {
     // Platform settings
     requireDesktop: true,
     requireChrome: false,
+    demo:true, //disable firebase 
 
     // Three.js settings
     orthographic: true,
