@@ -10,7 +10,7 @@ function change(param){
 }
 
 function exponentialRandom(lambda) {
-    return -Math.log(1 - Math.random()) / lambda;
+    return Math.log(1 - Math.random()) / lambda;
 }
 
 // Function to get inter-trial interval between 500ms and 1500ms

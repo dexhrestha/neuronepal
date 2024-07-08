@@ -37,6 +37,10 @@ async function main() {
    * All values in the configuration object will be saved in your data.
    * You can add variables throughout the experiment using `exp.cfg.VARNAME = VALUE`.
    */
+  
+  const config = JSON.parse(import.meta.env.VITE_CONFIG);
+  
+
   const exp = new Experiment({
     // Options to make development easier
     devOptions: {
@@ -73,11 +77,11 @@ async function main() {
     // speed : [1,0.5,2],
     // totalDuration 
     speed:[1],
-    dotDuration:  0.12,
-    charDuration: 0.12*3, //G
-    gapDuration:  0.12, //GG
-    dashDuration: 0.12*3,
-    responseWaitTime:3,
+    dotDuration:  config.dotDuration,
+    charDuration: config.dotDuration*3, //C
+    gapDuration:  config.dotDuration, //G
+    dashDuration: config.dotDuration*3,
+    responseWaitTime:config.responseWaitTime,
     experimentSourceCode: fileContents,
     searchParams : new URLSearchParams(window.location.search),
   });
@@ -86,8 +90,6 @@ async function main() {
    * Initialize visual stimuli with three.js
    */
 
-  const config = JSON.parse(import.meta.env.VITE_CONFIG);
-  console.log(config)
   
   const home = new Mesh(
     new SphereGeometry(exp.cfg.homeRadius),
@@ -119,20 +121,45 @@ async function main() {
   /*
    * Create trial sequence from array of block objects.
    */
-  exp.createTrialSequence([
-    new Block({
-      variables: {
-        // targetDirection: [-1, 1],
-        // targetDistance: [0.2, 0.2],
-        speed:exp.cfg.searchParams.get("DAY")>=5?[...Array.from({ length:15}, (_, i) => 1),...Array.from({ length:15}, (_, i) => 2),...Array.from({ length:15}, (_, i) => 0.5)]:Array.from({ length:15}, (_, i) => 1)
-      },
-      options: {
-        name: `Day ${exp.cfg.searchParams.get("DAY")} Block `,
-        reps: exp.cfg.searchParams.get("DAY")==5?5:15,
-        shuffle: true,
-      },
-    }),
-  ]);
+  if (exp.cfg.searchParams.get("DAY")>=5){
+    exp.createTrialSequence([
+      new Block({
+        variables: {
+          // targetDirection: [-1, 1],
+          // targetDistance: [0.2, 0.2],
+          speed:[...Array.from({ length:15}, (_, i) => 1)]
+        },
+        options: {
+          name: `Day ${exp.cfg.searchParams.get("DAY")} Block 1 `,
+          reps: 1,
+          shuffle: true,
+        },
+      }),
+      new Block({
+        variables: {
+          speed:[...Array.from({ length:15}, (_, i) => 1),...Array.from({ length:15}, (_, i) => 2),...Array.from({ length:15}, (_, i) => 0.5)]
+        },
+        options: {
+          name: `Day ${exp.cfg.searchParams.get("DAY")} Block 2 `,
+          reps: 5,
+          shuffle: true,
+        },
+      }),
+    ]);
+  }else{
+    exp.createTrialSequence([
+      new Block({
+        variables: {
+          speed:[...Array.from({ length:15}, (_, i) => 1)]
+        },
+        options: {
+          name: `Day ${exp.cfg.searchParams.get("DAY")} Block `,
+          reps: 15,
+          shuffle: true,
+        },
+      }),
+    ]);
+  }
 
   /*
    * You must initialize an empty object called trial
@@ -316,7 +343,6 @@ async function main() {
       case 'START':
         exp.state.once(() => {
           overlayText.element.innerText = 'Go to the home position.';          
-          console.log(process.env.TEST_CONFIG)
         });
 
         if(trial.currentToken>0){
@@ -334,9 +360,9 @@ async function main() {
         if (!cursor.atHome) {
           exp.state.next('START');
         } 
-        // else if (exp.state.expired(exp.cfg.delayDuration)) {
+        else if (exp.state.expired(exp.cfg.delayDuration)) {
           exp.state.next(exp.cfg.sequence[trial.currentToken])
-        // }
+        }
         break;
       
       case '.':
