@@ -625,10 +625,7 @@ exp.sceneManager.scene.add(mask,mask2,mask3)
 }
 
   animate();
-
-
-
-
+  
   // Record frame data
   function handleFrameData() {
     trial.t.push(performance.now());

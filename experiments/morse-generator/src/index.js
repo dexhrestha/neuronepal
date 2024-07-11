@@ -127,21 +127,21 @@ async function main() {
         variables: {
           // targetDirection: [-1, 1],
           // targetDistance: [0.2, 0.2],
-          speed:[...Array.from({ length:15}, (_, i) => 1)]
+          speed:[...Array.from({ length:config.numTrials}, (_, i) => 1)]
         },
         options: {
           name: `Day ${exp.cfg.searchParams.get("DAY")} Block 1 `,
-          reps: 1,
+          reps: config.numBlocksTest,
           shuffle: true,
         },
       }),
       new Block({
         variables: {
-          speed:[...Array.from({ length:15}, (_, i) => 1),...Array.from({ length:15}, (_, i) => 2),...Array.from({ length:15}, (_, i) => 0.5)]
+          speed:[...Array.from({ length:config.numTrials}, (_, i) => 1),...Array.from({ length:15}, (_, i) => 2),...Array.from({ length:15}, (_, i) => 0.5)]
         },
         options: {
           name: `Day ${exp.cfg.searchParams.get("DAY")} Block 2 `,
-          reps: 5,
+          reps: config.numBlocksTest,
           shuffle: true,
         },
       }),
@@ -150,11 +150,11 @@ async function main() {
     exp.createTrialSequence([
       new Block({
         variables: {
-          speed:[...Array.from({ length:15}, (_, i) => 1)]
+          speed:[...Array.from({ length:config.numTrials}, (_, i) => 1)]
         },
         options: {
           name: `Day ${exp.cfg.searchParams.get("DAY")} Block `,
-          reps: 15,
+          reps: config.numBlocksTrain,
           shuffle: true,
         },
       }),

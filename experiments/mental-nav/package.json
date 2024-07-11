@@ -1,8 +1,0 @@
-{
-  "name": "ouvrai-template-cursor",
-  "version": "1.0.0",
-  "type": "module",
-  "dependencies": {
-    "ouvrai": "../.."
-  }
-}
