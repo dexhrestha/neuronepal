@@ -2,9 +2,11 @@
 import {
   AlwaysStencilFunc,
   Color,
+  MathUtils,
   Mesh,
   MeshBasicMaterial,
   MeshStandardMaterial,
+  OrthographicCamera,
   PlaneGeometry,
   ReplaceStencilOp,
   SphereGeometry,
@@ -24,7 +26,6 @@ import {
 } from 'ouvrai';
 import { fileContents } from './fileContents.js';
 import { sampleDelay } from './utils.js';
-import { step } from 'three/examples/jsm/nodes/Nodes.js';
 
 /*
  * Main function contains all experiment logic. At a minimum you should:
@@ -83,7 +84,13 @@ async function main() {
    */
 
   const config = JSON.parse(import.meta.env.VITE_CONFIG);
-  console.log(config)
+  const camera_size = 5;
+
+  exp.sceneManager.camera.position.z = 0.57;  
+  const visualAngle = 0.5;
+  const distance = 57;
+   
+  const size = 2 * Math.tan(MathUtils.degToRad(visualAngle / 2)) * distance;
 
   let score = 0;
   let moveLeft =false;
@@ -169,9 +176,9 @@ exp.sceneManager.scene.add(mask,mask2,mask3)
   /*
    * Create trial sequence from array of block objects.
    */
+  const frameRate = 60;
+  const initStep = (config.interLandmarkDistance/0.5)/frameRate;
   const stepSizes = config.stepSizes;
-    console.log(stepSizes[0])
-
   exp.createTrialSequence([
     new Block({
       variables: {
@@ -242,6 +249,7 @@ exp.sceneManager.scene.add(mask,mask2,mask3)
       'START',
       'DELAY',
       'INITIAL',
+      'TARGET',
       'GO',
       'MOVING',
       'STOP',
@@ -285,10 +293,6 @@ exp.sceneManager.scene.add(mask,mask2,mask3)
       cursPosXY.distanceTo(homePosXY) <
       exp.cfg.homeRadius - exp.cfg.cursorRadius;
 
-    if (!cursor.atHome){
-      overlayText.element.innerText = 'Go to the home position.';
-      exp.state.next('SETUP')
-    }
 
     
     // cursor.atTarget =
@@ -370,11 +374,9 @@ exp.sceneManager.scene.add(mask,mask2,mask3)
 
         landmarks.forEach((landmark,index)=>{
           landmark.position.x = (index-trial.startId) * (landmarkWidth + interlmdistance)
-          console.log(landmark.position.x,trial.startId)
           exp.sceneManager.scene.add(landmark)
         });
         
-        console.log("StartID",trial.startId)
         target.material.map = textureLoader.load(images[trial.targetId]);
         target.position.setY(-landmarkHeight);
         exp.sceneManager.scene.add(target)
@@ -388,8 +390,13 @@ exp.sceneManager.scene.add(mask,mask2,mask3)
       case 'START':
         exp.state.once(() => {
           overlayText.element.innerText = 'Go to the home position.';
+          mask3.visible = true;
         });
-        if (cursor.atHome) {
+        if (!cursor.atHome) {
+          overlayText.element.innerText = 'Go to the home position.';
+          exp.state.next('SETUP')
+        }
+        else{
           overlayText.element.innerText = '';
           exp.state.next('INITIAL');
         }
@@ -398,39 +405,54 @@ exp.sceneManager.scene.add(mask,mask2,mask3)
         case 'INITIAL':
           exp.state.once(()=>{
             target.visible = false;
-            mask3.visible = false;
+            mask3.visible = true;
             mask2.position.setX(-1.3);
             mask.position.setX(1.3);
           })
+
           if (!cursor.atHome) {
-            exp.state.next('START');
+            overlayText.element.innerText = 'Go to the home position.';
+            exp.state.next('START')
           } else if (exp.state.expired(sampleDelay(0.5,1.5))) {
               exp.state.next('DELAY');
           }
           break;
 
-      case 'DELAY':
+      case 'DELAY': // BLANK WHEN DELAY 0.5x 0.75x 1x
         if (!cursor.atHome) {
+          overlayText.element.innerText = 'Go to the home position.';
           exp.state.next('START');
         } else if (exp.state.expired(sampleDelay(0.5,1.5))) {
-          if (mask3.visible){
-            exp.state.next('INITIAL');
-          }else{
-            exp.state.next('GO');
-          }
+            if (mask3.visible){
+              exp.state.next('TARGET');  
+            }else{
+              exp.state.next('GO');
+            }
+            
+          
         }
         break;
 
+      case 'TARGET':
+        exp.state.once(()=>{
+          mask3.visible = false;
+        })
+        exp.state.next('DELAY')
+      break;
+
       case 'GO':
         exp.state.once(() => {
-          overlayText.element.innerText = `Move left or right to match the target below using left or right key.`;
+          overlayText.element.innerText = `Move left or right to match the target below using left or right key. ${trial.stepSize}`;
           // overlayText.element.innerText = `SESSION TYPE: ${exp.cfg.searchParams.get('DAY')} `
-          target.visible = true;
+          target.visible = true
           
         });
 
         handleFrameData();
-        if (cursor.atHome) {
+        if (!cursor.atHome) {
+          overlayText.element.innerText = 'Go to the home position.';
+          exp.state.next('START')}
+        else {
           if (moveLeft||moveRight) {
             exp.state.next('MOVING');
           }
@@ -441,7 +463,6 @@ exp.sceneManager.scene.add(mask,mask2,mask3)
         exp.state.once(()=>{
           mask2.position.setX(-1.5);
           mask.position.setX(1.5);
-          // console.log("moving",landmarks[trial.startId].position.x)
           if (!trial.isTrain){
             landmarks.filter((landmark)=>(landmark.position.x>0.7)||(landmark.position.x<-0.7)).forEach((landmark)=>{landmark.visible=false})
           }
@@ -449,7 +470,10 @@ exp.sceneManager.scene.add(mask,mask2,mask3)
         handleFrameData();
 
         
-        if (cursor.atHome) {
+        if (!cursor.atHome) {
+          overlayText.element.innerText = 'Go to the home position.';
+          exp.state.next('START')}
+        else {
           // target.visible = false;
           if (!(moveLeft||moveRight)) {
             // target.visible = false;
@@ -472,7 +496,10 @@ exp.sceneManager.scene.add(mask,mask2,mask3)
           // console.log(landmarks[trial.targetId].position.x)
         });
         handleFrameData();
-        if (cursor.atHome) {
+      if (!cursor.atHome) {
+          overlayText.element.innerText = 'Go to the home position.';
+          exp.state.next('START')}
+        else  {
           if (moveLeft||moveRight) {
             trial.attempt +=1;
             console.log("Attempt no:",trial.attempt);
@@ -625,7 +652,8 @@ exp.sceneManager.scene.add(mask,mask2,mask3)
 }
 
   animate();
-  
+
+
   // Record frame data
   function handleFrameData() {
     trial.t.push(performance.now());
