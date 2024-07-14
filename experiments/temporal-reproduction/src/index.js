@@ -114,7 +114,7 @@ async function main() {
   const scoreText = new CSS2D();
   scoreText.object.position.set(0.7,0.5,0);
   exp.sceneManager.cssScene.add(scoreText.object);
-
+  let isKeyDown = false;
   /*
    * Create trial sequence from array of block objects.
    */
@@ -445,13 +445,11 @@ async function main() {
           exp.state.next('START');
         }
         //reset 
-        exp.state.once(()=>console.log(performance.now()) )
       break;
  
       case 'REPRODUCE':
         exp.state.once(()=>{
           overlayText.element.innerText = `Reproduce the morse code using Right Key `+ (trial.isTrain?` at ${trial.speed}x speed`:'')
-          exp.state.once(()=>console.log(performance.now()))
         })
         if (!cursor.atHome) {
           exp.state.next('START');
@@ -491,13 +489,14 @@ async function main() {
   function displayFunc() {
     // Set the color of the home position material
     home.material.color = new Color(
-      ['.'].includes(exp.state.current) ? 'hsl(0, 100%, 50%)' : 'hsl(210, 50%, 35%)'
+      isKeyDown || ['.'].includes(exp.state.current) ? 'hsl(0, 100%, 50%)' : 'hsl(210, 50%, 35%)'
     );
 
     
     
     // Show or hide the cursor
     cursor.visible = exp.state.between('SETUP', 'ADVANCE');
+    
     // Render
     exp.sceneManager.render();
   }
@@ -522,14 +521,18 @@ async function main() {
     if (exp.state.current==='REPRODUCE' && e.key=='ArrowRight'){
       exp.state.next('DOWN')
     }
-    
+    if (exp.state.current=='DOWN')
+    {isKeyDown = true;}
+
   }
 
   function handleKeyUp(e){
     if (exp.state.current==='DOWN' && e.key=='ArrowRight'){
       exp.state.next('REPRODUCE')
+      
     }
-
+    if (exp.state.current=='REPRODUCE')
+    {isKeyDown = false;}    
     
   }
 
