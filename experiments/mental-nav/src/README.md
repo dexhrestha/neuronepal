@@ -1,10 +1,6 @@
-# Experiment Repository
-This repository contains all the experiment designed as part our Neuroscience research.
+# Mental navigation task
 
-# Current Experiemnts
-## 1. Mental Navigation Task
-
-## Analysis of timing errors in mental navigation at multiple speeds
+Analysis of timing errors in mental navigation at multiple speeds
 
 The research question we are asking is how does brain scale mental simulaton in different time scales. Does the scaling dynamics differ for working and episodic memory?
 
@@ -12,6 +8,3 @@ To perform  mental simulation, there are many strategies, among them two strateg
 
 Through behavioral analysis and psychophysics we aim to identify the subjects who use cognitive maps and learn how they can scale in different time scales.
 
-## 2. Temporal Reproduction Task
-
-Through this task we want to understand the scaling of temporal 

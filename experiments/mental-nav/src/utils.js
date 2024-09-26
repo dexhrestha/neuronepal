@@ -19,6 +19,12 @@ function exponentialRandom(lambda) {
     return -Math.log(1 - Math.random()) / lambda;
 }
 
+function randomUniform(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+  
+  
+
 // Function to get inter-trial interval between 500ms and 1500ms
 function sampleDelay(minDelay=500,maxDelay=1500) {
     const meanDelay = (maxDelay - minDelay) / 2; // mean of the desired range
@@ -39,4 +45,4 @@ function sampleDelay(minDelay=500,maxDelay=1500) {
 }
 
 
-export {rearrangeArray,sampleDelay}
+export {rearrangeArray,sampleDelay,randomUniform}

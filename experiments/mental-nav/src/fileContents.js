@@ -1,10 +1,14 @@
 export const fileContents = `// Third-party imports
 import {
   AlwaysStencilFunc,
+  CircleGeometry,
+  Clock,
   Color,
+  MathUtils,
   Mesh,
   MeshBasicMaterial,
   MeshStandardMaterial,
+  OrthographicCamera,
   PlaneGeometry,
   ReplaceStencilOp,
   SphereGeometry,
@@ -23,9 +27,8 @@ import {
   CSS2D,
 } from 'ouvrai';
 import { fileContents } from './fileContents.js';
-import { sampleDelay } from './utils.js';
-import { step } from 'three/examples/jsm/nodes/Nodes.js';
-
+import { sampleDelay,randomUniform } from './utils.js';
+import { degToRad, radToDeg } from 'three/src/math/MathUtils.js';
 /*
  * Main function contains all experiment logic. At a minimum you should:
  * 1. Create a \`new Experiment({...config})\`
@@ -36,6 +39,62 @@ import { step } from 'three/examples/jsm/nodes/Nodes.js';
  * 6. Design your experiment by editing \`calcFunc\`, \`stateFunc\`, and \`displayFunc\`
  */
 
+
+function worldToPixel(worldPosition, camera, screenWidth, screenHeight) {
+  // Convert world position to NDC
+  const ndc = worldToNDC(worldPosition, camera);
+  
+  // Convert NDC to screen coordinates
+  return ndcToScreen(ndc, screenWidth, screenHeight);
+}
+
+function worldToNDC(worldPosition, camera) {
+  const vector = new Vector3();
+  vector.copy(worldPosition).project(camera);
+  return vector;
+}
+
+function pixelToNDCSize(pixelSize) {
+  // Convert pixelX to NDC x
+  return (pixelSize / window.innerHeight) * 2;
+  
+}
+
+function ndcToScreen(ndc, screenWidth, screenHeight) {
+
+  const x = (ndc.x + 1) / 2 * screenWidth;
+  const y = (-ndc.y + 1) / 2 * screenHeight; // Y is inverted
+  return { x, y };
+}
+
+function vaToPixels(angleDegrees, distance, screenHeightcm) {
+  // Convert angle from degrees to radians
+  
+  const dpp =  radToDeg(Math.atan2(0.5 * screenHeightcm, distance)) / (0.5 * window.innerHeight); //degree per pixel
+  const pixelSize = angleDegrees / dpp;
+
+  return pixelSize;
+}
+
+function vaToNdC(angleDegrees,distance,screenHeightcm){
+  // const dpp =  radToDeg(Math.atan2(0.5 * screenHeightcm, distance)) / (0.5 * screenSize); //degree per pixel
+  const pixelSize = vaToPixels(angleDegrees,distance,screenHeightcm);
+  // console.log("pxel size",pixelSize);
+  const ndc = pixelToNDCSize(pixelSize);
+  // console.log("ndc",ndc);
+  return ndc;
+}
+
+function ndcToVA(ndc,distance,screenHeightcm){
+  const dpp =  radToDeg(Math.atan2(0.5 * screenHeightcm, distance)) / (0.5 * window.innerHeight); //degree per pixel
+  
+  const pixels = ((ndc+1)/2)* window.innerHeight;
+  
+  const va = pixels * dpp;
+  
+  return pixels;
+}
+
 async function main() {
   /*
    * The first step is always to create a new Experiment({...config}) with your configuration options.
@@ -43,14 +102,18 @@ async function main() {
    * You can also provide other experiment-level variables here as additional fields.
    * All values in the configuration object will be saved in your data.
    * You can add variables throughout the experiment using \`exp.cfg.VARNAME = VALUE\`.
-   */
+
+*/
+
+// Example usage
+  
   const exp = new Experiment({
     // Options to make development easier
     devOptions: {
       skipConsent: true,
       saveTrialList: false,
-      allowExitFullscreen: false,
-      allowExitPointerlock: false,
+      allowExitFullscreen: false, // set to flase
+      allowExitPointerlock: false, //set to false
     },
 
     // Platform settings
@@ -69,6 +132,7 @@ async function main() {
     targetRadius: 0.04,
     homeRadius: 0.05,
     score:0,
+    acc:0,
 
     // Procedure
     delayDuration: sampleDelay(0.5,1.5),
@@ -78,19 +142,68 @@ async function main() {
 
   });
 
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
+  console.log("ActuaLScreenwidth",screenWidth,screenHeight)
+    
+  const frustumWidth = exp.sceneManager.camera.right - exp.sceneManager.camera.left;
+  const frustumHeight = exp.sceneManager.camera.top - exp.sceneManager.camera.bottom;
+
+  console.log("camera",exp.sceneManager.camera);
   /*
    * Initialize visual stimuli with three.js
    */
-
   const config = JSON.parse(import.meta.env.VITE_CONFIG);
-  console.log(config)
+  //Display a cricle with random dots
 
-  let score = 0;
-  let moveLeft =false;
-  let moveRight = false;
-  const landmarkHeight = config.landmarkHeight;
-  const landmarkWidth = config.landmarkWidth;
-  const interlmdistance = config.interLandmarkDistance;
+  const segments = 64; // more segments = more smooth
+
+
+  const patchgeometry = new CircleGeometry(config.patchRadius, segments);
+  const patchmaterial = new MeshBasicMaterial({color:0x000000});
+
+  const patch = new Mesh(patchgeometry,patchmaterial)
+  patch.position.setX(0,0,0);
+  exp.sceneManager.scene.add(patch)
+
+  const dots = [];
+
+for (let i = 0; i < config.ndots; i++) {
+  // Generate a random radius between config.dotRadius / 2 and config.dotRadius
+  const randomRadius = (Math.random() * (config.dotRadius / 2)) + (config.dotRadius / 2);
+
+  // Create the geometry with the random radius
+  const dotGeometry = new CircleGeometry(randomRadius, segments);
+  const dotMaterial = new MeshBasicMaterial({ color: 0xc0c0c0 });
+
+  // Create the dot mesh
+  const dot = new Mesh(dotGeometry, dotMaterial);
+  
+  // Set a random position for the dot
+  setRandomPosition(dot);
+
+  // Assign a random life value to the dot
+  dot.life = Math.random() * config.dotLife; // in distance
+
+  // Add the dot to the scene and store it in the dots array
+  exp.sceneManager.scene.add(dot);
+  dots.push(dot);
+}
+
+  const objectDistance = config.objectDistance; //cm
+  const screenHeightcm = config.screenHeightcm; //screenHeightcm
+
+  let moveLeft = {lm:false,dot:false};
+
+  let moveRight = {lm:false,dot:false};
+  let isKeyDown = false;
+
+  const landmarkHeight = Math.abs(vaToNdC(config.landmarkHeight,objectDistance,screenHeightcm));
+  const landmarkWidth = Math.abs(vaToNdC(config.landmarkWidth,objectDistance,screenHeightcm));
+
+  console.log("NDC H,w",landmarkHeight,landmarkWidth)
+
+  const interlmdistance = Math.abs(vaToNdC(config.interLandmarkDistance,objectDistance,screenHeightcm));
   const landmarks = [];
   const textureLoader = new TextureLoader();
   const imageset = config.imageset;
@@ -99,40 +212,48 @@ async function main() {
   
   const geometry = new PlaneGeometry(landmarkWidth, landmarkHeight);
 
+  let clock = new Clock();
 
   images.forEach((image, index) => {
     const texture = textureLoader.load(image); // Replace with the path to your image
     const material = new MeshBasicMaterial({ map:texture });
-    const landmark = new Mesh(geometry, material);
-    landmark.position.x = index * (landmarkWidth + interlmdistance)
-    landmark.position.setY(0.2);
-    landmarks.push(landmark);
+    const lm = new Mesh(geometry, material);
+    lm.position.setX(parseInt(index * (landmarkWidth + interlmdistance)));
+    lm.position.setY(config.landmarkY);
+
+    // Create a central fixation dot
+    const dotGeometry = new SphereGeometry(0.01, 32, 32); // Adjust the radius as needed
+    const dotMaterial = new MeshBasicMaterial({ color: 0xff0000 }); // Red dot
+    const fixationDot = new Mesh(dotGeometry, dotMaterial);
+
+    // Position the fixation dot at the center of the landmark
+    fixationDot.position.set(0, 0, 0); // Assuming the landmark's center is (0, 0, 0)
+
+    // Add the fixation dot to the landmark
+    lm.add(fixationDot);
+
+    landmarks.push(lm);
 });
 
 const maskGeometry = new PlaneGeometry(landmarkWidth*5,landmarkHeight);
 const maskMaterial = new MeshBasicMaterial({ color: 0x242424, depthWrite: false, stencilWrite: true, stencilFunc: AlwaysStencilFunc, stencilRef: 1, stencilMask: 0xff, stencilFail: ReplaceStencilOp, stencilZFail: ReplaceStencilOp, stencilZPass: ReplaceStencilOp });
 const mask = new Mesh(maskGeometry, maskMaterial);
-mask.position.setY(0.2);
-mask.position.setX(-1.5);
-mask.position.z = 0.1;
 
 
-// exp.sceneManager.camera.z = 10;
 const maskGeometry2 = new PlaneGeometry(landmarkWidth*5,landmarkHeight);
 const maskMaterial2 = new MeshBasicMaterial({ color:  0x242424, depthWrite: false, stencilWrite: true, stencilFunc: AlwaysStencilFunc, stencilRef: 1, stencilMask: 0xff, stencilFail: ReplaceStencilOp, stencilZFail: ReplaceStencilOp, stencilZPass: ReplaceStencilOp });
 const mask2 = new Mesh(maskGeometry2 , maskMaterial2);
-mask2.position.setX(1.5);
-mask2.position.setY(0.2);
-mask2.position.z = 0.1;
+
 
 const maskGeometry3 = new PlaneGeometry(landmarkWidth*3,landmarkHeight);
 const maskMaterial3 = new MeshBasicMaterial({ color: 0x242424, depthWrite: false, stencilWrite: true, stencilFunc: AlwaysStencilFunc, stencilRef: 1, stencilMask: 0xff, stencilFail: ReplaceStencilOp, stencilZFail: ReplaceStencilOp, stencilZPass: ReplaceStencilOp });
 const mask3 = new Mesh(maskGeometry3 , maskMaterial3);
-mask3.position.setX(0);
-mask3.position.setY(0.2);
-mask3.position.z = 0.1;
-exp.sceneManager.scene.add(mask,mask2,mask3)
+// exp.sceneManager.scene.add(mask,mask2,mask3)
 
+landmarks.forEach((landmark)=>{
+  landmark.visible = false;
+  exp.sceneManager.scene.add(landmark);
+});
 
   const target  = new Mesh(
     geometry,
@@ -144,56 +265,164 @@ exp.sceneManager.scene.add(mask,mask2,mask3)
     new MeshStandardMaterial({ color: 'red' })
   );
   cursor.position.setZ(exp.cfg.homeRadius + exp.cfg.cursorRadius);
-
+  
   const home = new Mesh(
     new SphereGeometry(exp.cfg.cursorRadius*2),
     new MeshStandardMaterial({ color: 'white' })
-
   )
-  home.position.setY(-0.1);
-  cursor.position.setY(-0.1);
+
+  home.position.set(0,0,0);
+  cursor.position.setY(0,0,0);
 
   exp.sceneManager.scene.add(home,cursor)
 
   /*
    * You can display overlay text on the scene by adding CSS2D to cssScene
    */
-  const overlayText = new CSS2D();
-  overlayText.object.position.set(0, 0.67, 0);
+  const overlayText = new CSS2D({color:0xffffff});
+  overlayText.object.position.set(0, 0.7);
+  overlayText.element.innerText = '';
+  overlayText.element.style.color = 'white';
+
   exp.sceneManager.cssScene.add(overlayText.object);
+
+function setRandomPosition(dot){
+  const angle = Math.random() * 2 * Math.PI;
+  const r = config.patchRadius * Math.sqrt(Math.random());  // Uniform distribution within the circle
+  const x = r * Math.cos(angle);
+  const y = r * Math.sin(angle);
+  dot.position.set(x,y,0)
+}
+
+// const dot = new Mesh(dotGometry, dotMaterial);
+// const angle = 0;
+// const x = Math.cos(angle) * 1;
+// const y = Math.sin(angle) * 1;
+// dot.position.set(x,y,0)
+// exp.sceneManager.scene.add(dot);
 
   // Display a score
   const scoreText = new CSS2D();
-  scoreText.object.position.set(0.7,0.5,0);
+  scoreText.object.position.set(0.9,0.7,0.01);
   scoreText.element.innerText = ' Score: ';  
+  scoreText.element.style.color = 'white';
+
   /*
    * Create trial sequence from array of block objects.
    */
+  const frameRate = 60;
+  const initStep = (config.interLandmarkDistance/0.5)/frameRate;
   const stepSizes = config.stepSizes;
-    console.log(stepSizes[0])
+  if (exp.cfg.searchParams.get("COHORT")==1){ // use multiple speeds
+    
+    exp.createTrialSequence([
+      new Block({
+        variables: {
+          startId : Array.from({ length: numLandmarks*(numLandmarks-1) * stepSizes.length }, (_, i) => Math.floor(i / (numLandmarks-1))%numLandmarks),
+          // startId : Array.from({ length:  5 }, (_, i) => 0),
+          targetId :  Array.from({ length: numLandmarks*  stepSizes.length }, (_, i) => [...Array(numLandmarks).keys()].filter(num => num !== i % numLandmarks)).flat(),
+          // targetId :  Array.from({ length:5}, (_, i) => 8),
 
-  exp.createTrialSequence([
+        },
+        options: {
+          name: \`COHORT : \${exp.cfg.searchParams.get('COHORT')}, DAY: \${exp.cfg.searchParams.get('DAY')}, SPEEDS: 3\`,
+          reps: 1,
+          shuffle: true,
+        },
+      }),
+      new Block({
+        variables: {
+          startId : Array.from({ length: numLandmarks*(numLandmarks-1) * stepSizes.length }, (_, i) => Math.floor(i / (numLandmarks-1))%numLandmarks),
+          // startId : Array.from({ length:  5 }, (_, i) => 0),
+          targetId :  Array.from({ length: numLandmarks*  stepSizes.length }, (_, i) => [...Array(numLandmarks).keys()].filter(num => num !== i % numLandmarks)).flat(),
+          // targetId :  Array.from({ length:5}, (_, i) => 8),
+
+        },
+        options: {
+          name: \`COHORT : \${exp.cfg.searchParams.get('COHORT')}, DAY: \${exp.cfg.searchParams.get('DAY')}, SPEEDS: 3\`,
+          reps: 1,
+          shuffle: true,
+        },
+      }),
+      new Block({
+        variables: {
+          startId : Array.from({ length: numLandmarks*(numLandmarks-1) * stepSizes.length }, (_, i) => Math.floor(i / (numLandmarks-1))%numLandmarks),
+          // startId : Array.from({ length:  5 }, (_, i) => 0),
+          targetId :  Array.from({ length: numLandmarks*  stepSizes.length }, (_, i) => [...Array(numLandmarks).keys()].filter(num => num !== i % numLandmarks)).flat(),
+          // targetId :  Array.from({ length:5}, (_, i) => 8),
+
+        },
+        options: {
+          name: \`COHORT : \${exp.cfg.searchParams.get('COHORT')}, DAY: \${exp.cfg.searchParams.get('DAY')}, SPEEDS: 3\`,
+          reps: 1,
+          shuffle: true,
+        },
+      }),
+    ]);
+  }else{ // use single speed for train and different speed for test
+  exp.createTrialSequence([ //training block with 1x speed 
     new Block({
       variables: {
-        startId : Array.from({ length: numLandmarks*(numLandmarks-1) * 3 }, (_, i) => Math.floor(i / (numLandmarks-1))%numLandmarks),
+        startId : Array.from({ length: numLandmarks*(numLandmarks-1) * 1 }, (_, i) => Math.floor(i / (numLandmarks-1))%numLandmarks),
         // startId : Array.from({ length:  5 }, (_, i) => 0),
-        targetId :  Array.from({ length: numLandmarks*3  }, (_, i) => [...Array(numLandmarks).keys()].filter(num => num !== i % numLandmarks)).flat(),
+        targetId :  Array.from({ length: numLandmarks * 1  }, (_, i) => [...Array(numLandmarks).keys()].filter(num => num !== i % numLandmarks)).flat(),
         // targetId :  Array.from({ length:5}, (_, i) => 8),
-        stepSize :[
-          ...Array(numLandmarks*(numLandmarks-1)).fill(stepSizes[0]),
-          ...Array(numLandmarks*(numLandmarks-1)).fill(stepSizes[1]),
-          ...Array(numLandmarks*(numLandmarks-1)).fill(stepSizes[2])
-        ]
+        train : true,
         // stepSize : Array.from({ length:5}, (_, i) => stepSize),
       },
       options: {
-        name: exp.cfg.searchParams.get('DAY'),
+        name: \`COHORT : \${exp.cfg.searchParams.get('COHORT')}, DAY: \${exp.cfg.searchParams.get('DAY')}, SPEEDS: 1\`,
+        reps: 1,
+        shuffle: true,
+      },
+    }),
+    new Block({ //testing block with 2x and 0.5 x speed 
+      variables: {
+        startId : Array.from({ length: numLandmarks*(numLandmarks-1) *  (stepSizes.length -1) }, (_, i) => Math.floor(i / (numLandmarks-1))%numLandmarks),
+        // startId : Array.from({ length:  5 }, (_, i) => 0),
+        targetId :  Array.from({ length: numLandmarks* (stepSizes.length -1)  }, (_, i) => [...Array(numLandmarks).keys()].filter(num => num !== i % numLandmarks)).flat(),
+        // targetId :  Array.from({ length:5}, (_, i) => 8),
+        train:false,
+        // stepSize : Array.from({ length:5}, (_, i) => stepSize),
+      },
+      options: {
+        name: \`COHORT : \${exp.cfg.searchParams.get('COHORT')}, DAY: \${exp.cfg.searchParams.get('DAY')} , SPEEDS: 2\`,
+        reps: 1,
+        shuffle: true,
+      },
+    }),
+    new Block({ //testing block with 2x and 0.5 x speed 
+      variables: {
+        startId : Array.from({ length: numLandmarks*(numLandmarks-1) *  (stepSizes.length -1) }, (_, i) => Math.floor(i / (numLandmarks-1))%numLandmarks),
+        // startId : Array.from({ length:  5 }, (_, i) => 0),
+        targetId :  Array.from({ length: numLandmarks* (stepSizes.length -1)  }, (_, i) => [...Array(numLandmarks).keys()].filter(num => num !== i % numLandmarks)).flat(),
+        // targetId :  Array.from({ length:5}, (_, i) => 8),
+        train:false,
+        // stepSize : Array.from({ length:5}, (_, i) => stepSize),
+      },
+      options: {
+        name: \`COHORT : \${exp.cfg.searchParams.get('COHORT')}, DAY: \${exp.cfg.searchParams.get('DAY')} , SPEEDS: 2\`,
+        reps: 1,
+        shuffle: true,
+      },
+    }),
+    new Block({ //testing block with 2x and 0.5 x speed 
+      variables: {
+        startId : Array.from({ length: numLandmarks*(numLandmarks-1) *  (stepSizes.length -1) }, (_, i) => Math.floor(i / (numLandmarks-1))%numLandmarks),
+        // startId : Array.from({ length:  5 }, (_, i) => 0),
+        targetId :  Array.from({ length: numLandmarks* (stepSizes.length -1)  }, (_, i) => [...Array(numLandmarks).keys()].filter(num => num !== i % numLandmarks)).flat(),
+        // targetId :  Array.from({ length:5}, (_, i) => 8),
+        train:false,
+        // stepSize : Array.from({ length:5}, (_, i) => stepSize),
+      },
+      options: {
+        name: \`COHORT : \${exp.cfg.searchParams.get('COHORT')}, DAY: \${exp.cfg.searchParams.get('DAY')} , SPEEDS: 2\`,
         reps: 1,
         shuffle: true,
       },
     }),
   ]);
-
+  }
   /*
    * You must initialize an empty object called trial
    */
@@ -213,7 +442,9 @@ exp.sceneManager.scene.add(mask,mask2,mask3)
    * On Prolific, most participants have already provided this information.
    * On Mechanical Turk, Ouvrai collects this information separately on the HIT posting.
    */
+
   exp.survey = new Survey();
+
   exp.survey.addQuestion({
     type: 'list',
     name: 'device',
@@ -222,6 +453,7 @@ exp.sceneManager.scene.add(mask,mask2,mask3)
     choices: ['Keyboard', 'Other'],
     options: { required: true },
   });
+
   exp.survey.addQuestion({
     type: 'list',
     name: 'hand',
@@ -242,7 +474,10 @@ exp.sceneManager.scene.add(mask,mask2,mask3)
       'START',
       'DELAY',
       'INITIAL',
+      'TARGET',
       'GO',
+      'VISUAL',
+      'MENTAL',
       'MOVING',
       'STOP',
       'FINISH',
@@ -256,22 +491,19 @@ exp.sceneManager.scene.add(mask,mask2,mask3)
     ],
     handleStateChange
   );
-
   /*
    * Add a custom event handler that moves the cursor in response to mouse/trackpad inputs
    */
   document.body.addEventListener('mousemove', handleMouseMove);
   document.body.addEventListener('keydown', handleKeyDown);
   document.body.addEventListener('keyup',handleKeyUp);
-
   // Start the main loop! These three functions will take it from here.
   exp.start(calcFunc, stateFunc, displayFunc);
-
   /**
    * Use \`calcFunc\` for calculations used in _multiple states_
    */
   function calcFunc() {
-    // Objects are in 3D space so we copy to Vector2 to ignore the depth dimension
+    // Objects are in 3D space so we copy to Vector2 to ignore the depth dimensionh
     let cursPosXY = new Vector2().copy(cursor.position);
     let homePosXY = new Vector2().copy(home.position);
     let targPosXY = new Vector2().copy(trial.targetId===undefined?cursor.position:landmarks[trial.targetId].position);
@@ -279,18 +511,12 @@ exp.sceneManager.scene.add(mask,mask2,mask3)
     if (exp.state.current == 'STOP'){ 
       target.distance = Math.abs(targPosXY.x - homePosXY.x); 
     target.reached =  target.distance <= config.tolerance * landmarkWidth;
-  }
+    }
 
     cursor.atHome =
       cursPosXY.distanceTo(homePosXY) <
       exp.cfg.homeRadius - exp.cfg.cursorRadius;
 
-    if (!cursor.atHome){
-      overlayText.element.innerText = 'Go to the home position.';
-      exp.state.next('SETUP')
-    }
-
-    
     // cursor.atTarget =
     //   cursPosXY.distanceTo(targPosXY) <
     //   exp.cfg.targetRadius - exp.cfg.cursorRadius;
@@ -352,6 +578,32 @@ exp.sceneManager.scene.add(mask,mask2,mask3)
       // The following states should be modified as needed for your experiment
 
       case 'SETUP':
+        if (exp.cfg.searchParams.get("DAY")<3 & exp.cfg.searchParams.get("COHORT") == 1) {
+        // Handle Cohort 2 logic here
+          if (exp.trialNumber < config.initialTrials) {
+              // Initial trials: use the same speed for all intial visual trials
+              exp.trials[exp.trialNumber].speed = 0; // Assuming the speed for initial trials is 1, adjust as needed
+          } else {
+              if (exp.trialNumber % config.blockSpeed === 0) {
+                let previousSpeed = exp.trials[trial.trialNumber - 1]?exp.trials[exp.trialNumber - 1].speed:Math.random() * 3;
+                let availableSpeeds = [0, 1].filter(speed => speed !== previousSpeed);
+                exp.trials[exp.trialNumber].speed = availableSpeeds[Math.floor(Math.random() * availableSpeeds.length)];
+            }else{
+              exp.trials[exp.trialNumber].speed = exp.trials[exp.trialNumber-1].speed
+            }
+        }
+      } else{
+          if (exp.cfg.searchParams.get("DAY")<5){
+          if (exp.trialNumber % config.blockSpeed === 0) {
+            let previousSpeed = exp.trials[trial.trialNumber - 1]?exp.trials[exp.trialNumber - 1].speed:Math.random() * 3;
+            let availableSpeeds = [0, 1].filter(speed => speed !== previousSpeed);
+            exp.trials[exp.trialNumber].speed = availableSpeeds[Math.floor(Math.random() * availableSpeeds.length)];
+        }else{
+          exp.trials[exp.trialNumber].speed = exp.trials[exp.trialNumber-1].speed
+        }
+      }
+      }
+        
         // Start with a deep copy of the initialized trial from exp.trials
         trial = structuredClone(exp.trials[exp.trialNumber]);
         trial.trialNumber = exp.trialNumber;
@@ -365,31 +617,81 @@ exp.sceneManager.scene.add(mask,mask2,mask3)
         trial.attempt = 1;
         // Initialize trial parameters
         trial.demoTrial = exp.trialNumber === 0;
+        trial.stepSize = config.stepSizes[trial.speed]
         // target.position.setY(trial.targetDistance * trial.targetDirection);
-        trial.isTrain = exp.cfg.searchParams.get('DAY')<5;
+        // trial.startId = 5;
+        // trial.targetId = 3;
+        trial.isTrain = true;
+        exp.cfg.acc = exp.cfg.score/(exp.trialNumber+1)
+        if(exp.cfg.searchParams.get('DAY')<= config.accThresholds.length){ // for training days indicated  by number of thresholds
+          if (exp.trialNumber < config.initialTrials)
+            {
+              trial.isTrain = true;
+             }
+          else{
+            trial.isTrain = false;
+          }
+          // else{
+          //   if(exp.cfg.acc >= config.accThresholds[exp.cfg.searchParams.get('DAY')-1]){
+          //     trial.isTrain = false;
+          //   }else{
+          //     trial.isTrain = true;
+          //   }
+          // }
+        }
+        else{
+          trial.isTrain = false; // for other days use mental nav
+        }
 
-        landmarks.forEach((landmark,index)=>{
-          landmark.position.x = (index-trial.startId) * (landmarkWidth + interlmdistance)
-          console.log(landmark.position.x,trial.startId)
-          exp.sceneManager.scene.add(landmark)
-        });
-        
-        console.log("StartID",trial.startId)
         target.material.map = textureLoader.load(images[trial.targetId]);
-        target.position.setY(-landmarkHeight);
+        target.position.setY(config.targetY);
         exp.sceneManager.scene.add(target)
         target.visible = false;
         mask3.visible = true;
         if (cursor.atHome) {
           exp.state.next('START');
         }
+// Set the speed for the trial (it will be the same for the next 15 trials)
+
         break;
 
       case 'START':
         exp.state.once(() => {
-          overlayText.element.innerText = 'Go to the home position.';
+
+          if(exp.cfg.searchParams.get('DAY')>=5){
+            // trial.stepSize = 0.05// draw from cont dist ();
+            if (exp.trialNumber % config.blockSpeed === 0) {
+              trial.stepSize =  randomUniform(5,50);
+              exp.trials[exp.trialNumber].stepSize = trial.stepSize;
+              }else{
+                exp.trials[exp.trialNumber].stepSize = exp.trials[exp.trialNumber-1].stepSize;
+                trial.stepSize =  exp.trials[exp.trialNumber-1].stepSize;
+              }
+  
+          }
+          console.log("Speed:",trial.stepSize);
+          
+  
+          trial.trueTime = Math.abs(landmarks[trial.targetId].position.x-landmarks[trial.startId].position.x)/vaToNdC(trial.stepSize,objectDistance,screenHeightcm)*1000;
+          overlayText.element.innerText = 'Go to the home position. \n Press s Key to End the experiment';
+          
+        landmarks.forEach((lm,index)=>{
+          lm.position.setX((index - trial.startId) * (landmarkWidth + interlmdistance));
+          if(trial.isTrain){
+            lm.visible = trial.isTrain;
+          }else{
+            lm.visible = lm.position.x == 0;
+          }
+        })
+
+          mask3.visible = true;
+
         });
-        if (cursor.atHome) {
+        if (!cursor.atHome) {
+          overlayText.element.innerText = 'Go to the home position. \n Press s Key to End the experiment';
+          exp.state.next('SETUP')
+        }
+        else{
           overlayText.element.innerText = '';
           exp.state.next('INITIAL');
         }
@@ -398,40 +700,57 @@ exp.sceneManager.scene.add(mask,mask2,mask3)
         case 'INITIAL':
           exp.state.once(()=>{
             target.visible = false;
-            mask3.visible = false;
+            mask3.visible = true;
             mask2.position.setX(-1.3);
             mask.position.setX(1.3);
           })
+
           if (!cursor.atHome) {
-            exp.state.next('START');
+            overlayText.element.innerText = 'Go to the home position. \n Press s Key to End the experiment';
+            exp.state.next('START')
           } else if (exp.state.expired(sampleDelay(0.5,1.5))) {
               exp.state.next('DELAY');
           }
           break;
 
-      case 'DELAY':
+      case 'DELAY': // BLANK WHEN DELAY 0.5x 0.75x 1x
         if (!cursor.atHome) {
+          overlayText.element.innerText = 'Go to the home position. \n Press s Key to End the experiment';
           exp.state.next('START');
         } else if (exp.state.expired(sampleDelay(0.5,1.5))) {
-          if (mask3.visible){
-            exp.state.next('INITIAL');
-          }else{
-            exp.state.next('GO');
-          }
+            if (mask3.visible){
+              exp.state.next('TARGET');  
+            }else{
+              exp.state.next('GO');
+            }
         }
         break;
 
+      case 'TARGET':
+        exp.state.once(()=>{
+          mask3.visible = false;
+        })
+        exp.state.next('DELAY')
+      break;
+
       case 'GO':
         exp.state.once(() => {
-          overlayText.element.innerText = \`Move left or right to match the target below using left or right key.\`;
+          overlayText.element.innerText = \`Move left or right to match the target below using left or right key. \n Press s Key to End the experiment. \`;
+          //  \n STEP: \${trial.stepSize} TN: \${trial.trialNumber} Attempt:\${trial.attempt}\`;
           // overlayText.element.innerText = \`SESSION TYPE: \${exp.cfg.searchParams.get('DAY')} \`
           target.visible = true;
-          
+          console.log(trial.isTrain);
         });
 
+        mask.visible = false;
+        mask2.visible = false;
+        
         handleFrameData();
-        if (cursor.atHome) {
-          if (moveLeft||moveRight) {
+        if (!cursor.atHome) {
+          overlayText.element.innerText = 'Go to the home position. \n Press s Key to End the experiment';
+          exp.state.next('START')}
+        else {
+          if (moveLeft.lm||moveRight.lm) {
             exp.state.next('MOVING');
           }
         }
@@ -439,51 +758,96 @@ exp.sceneManager.scene.add(mask,mask2,mask3)
 
       case 'MOVING':
         exp.state.once(()=>{
+          trial.keyDown = performance.now();
           mask2.position.setX(-1.5);
           mask.position.setX(1.5);
-          // console.log("moving",landmarks[trial.startId].position.x)
+          overlayText.element.innerText = '';
           if (!trial.isTrain){
-            landmarks.filter((landmark)=>(landmark.position.x>0.7)||(landmark.position.x<-0.7)).forEach((landmark)=>{landmark.visible=false})
+            // landmarks.filter((landmark)=>(landmark.position.x>0.7)||(landmark.position.x<-0.7)).forEach((landmark)=>{landmark.visible=false})
+            landmarks.forEach(lm=>lm.visible=false)
           }
         })
         handleFrameData();
 
-        
-        if (cursor.atHome) {
+        target.visible= trial.isTrain;
+        if (!cursor.atHome) {
+          overlayText.element.innerText = 'Go to the home position.';
+          exp.state.next('START')}
+        else {
           // target.visible = false;
-          if (!(moveLeft||moveRight)) {
+          if (!(moveLeft.lm||moveRight.lm)  && !isKeyDown) {
             // target.visible = false;
             exp.state.next('STOP');
           }
-          if (!trial.isTrain){
-            if(((landmarks[trial.startId].position.x>0.7)||((landmarks[trial.startId].position.x<-0.7)))){
-              landmarks[trial.startId].visible=false;
-            }
-          }
+
+        landmarks.forEach(lm=>lm.visible=trial.isTrain)
         }
         break;
 
       case 'STOP':
-        exp.state.once(() => {
-          // overlayText.element.innerText = 'Stopped checking target ';
+        exp.state.once(() => {              
+          trial.producedTime = performance.now() - trial.keyDown;
+          console.log('produced Time',trial.producedTime);
+          console.log('true Time',trial.trueTime);
+          
           if (!trial.isTrain){
             landmarks.filter(l=>(l.position.x>-0.7)||(l.position.x<0.7)).forEach(l=>{l.visible=true})
           }
-          // console.log(landmarks[trial.targetId].position.x)
-        });
-        handleFrameData();
-        if (cursor.atHome) {
-          if (moveLeft||moveRight) {
-            trial.attempt +=1;
-            console.log("Attempt no:",trial.attempt);
-            exp.state.next('MOVING');
-          }
-        }
+        target.visible= true;
         if (target.reached) {
           if (trial.attempt === 1){
-            exp.cfg.score +=1;
+            exp.cfg.score += 1;
           }
-          exp.state.next('FINISH');
+          if (exp.state.expired(sampleDelay(0.5,1.5))){
+            exp.state.next('FINISH')
+          } 
+        }
+        if (trial.isTrain){
+          landmarks.forEach(l=>{l.visible=true})}
+        else{
+          landmarks.filter(l=>(l.position.x>=-2)&(l.position.x<=2)).forEach(l=>{l.visible=true})
+        }
+        overlayText.element.innerText = \`Move left or right to match the target below using left or right key. \n Press s Key to End the experiment.\`;
+        // \n STEP: \${trial.stepSize} TN: \${trial.trialNumber} Attempt:\${trial.attempt}\`; 
+        trial.currentTargetPos = landmarks[trial.targetId].position.x;
+        
+        
+
+        });
+
+        handleFrameData();
+        if (!cursor.atHome) {
+            overlayText.element.innerText = 'Go to the home position.';
+            exp.state.next('START')}
+          else  {
+            if (target.reached) {
+              if (trial.attempt == 1){
+                exp.state.once(() => exp.cfg.score += 1);
+              }
+              
+              if (exp.state.expired(sampleDelay(0.5,1.5))){
+                exp.state.next('FINISH')
+              } 
+            }
+            else{
+              // if (exp.cfg.searchParams.get('DAY')<3){ // for trainingg days
+                if (trial.attempt>1){  // show the  target and current  positiion
+                  target.visible = true;
+                  if(exp.state.expired(sampleDelay(0.5,1.5))){                  
+                    cursor.material.color = new Color( 'hsl(0, 100%, 50%)')// change color to red and restart 
+                    exp.state.next('FINISH')
+                  }
+                }
+              // }else{
+                // if (exp.state.expired(sampleDelay(0.5,1.5))){ //other days  go to finish
+                //     exp.state.next('FINISH')
+                //   }
+              // }
+            }
+          if (moveLeft.lm||moveRight.lm) {
+            trial.attempt +=1;
+            exp.state.next('MOVING');
+          }
         }
         break;
 
@@ -502,7 +866,7 @@ exp.sceneManager.scene.add(mask,mask2,mask3)
         // Change the code to caluclate score and display
         // Wrtie score calculating algorithm
         console.log("SCORE",Math.round(exp.cfg.score/(exp.trialNumber+1)*100,2))
-        scoreText.element.innerText = \`Score :  \${Math.round(exp.cfg.score/(exp.trialNumber+1)*100,2)}% \n Trials Completed : \${exp.trialNumber+1}\`
+        scoreText.element.innerText = \`Score :  \${Math.round((exp.cfg.score/(exp.trialNumber+1))*100,2)}% \n Trials Completed : \${exp.trialNumber+1}\`
         exp.sceneManager.cssScene.add(scoreText.object)
         exp.nextTrial();
         if (exp.trialNumber < exp.numTrials) {
@@ -567,24 +931,27 @@ exp.sceneManager.scene.add(mask,mask2,mask3)
   function displayFunc() {
     // Set the color of the home position material
     home.material.color = new Color(
-      cursor.atHome ? 'hsl(210, 100%, 60%)' : 'hsl(210, 50%, 35%)'
+      cursor.atHome ? 'hsl(116, 0%, 50%)' : 'hsl(0, 0%, 100%)'
     );
 
     cursor.material.color = new Color(
-      exp.state.between('GO','ADVANCE') ? 'hsl(0, 0%, 100%)' : 'hsl(0, 100%, 50%)'
+      exp.state.between('GO','ADVANCE') ? 'hsl(116, 100%, 50%)' : 'hsl(0, 100%, 50%)'
     )
     
     // Show or hide the cursor
     cursor.visible = exp.state.between('SETUP', 'ADVANCE');
     // Render
     exp.sceneManager.render();
-        if (landmarks[0].position.x > parseFloat(landmarkWidth*1.3).toFixed(2)){
-      moveRight = false;
+    if (landmarks[0].position.x > parseFloat(landmarkWidth*1.3).toFixed(2)){
+      moveRight.lm = false;
+      moveRight.dot=trial.train?false:moveRight.dot;
     }
     if (landmarks[landmarks.length-1].position.x < parseFloat(-landmarkWidth*1.3).toFixed(2)){
-      moveLeft = false;
+      
+      moveLeft.lm = false;
+      moveLeft.dot=trial.isTrain?false:moveLeft.dot;
     }
-
+    
   }
 
   /**
@@ -599,37 +966,81 @@ exp.sceneManager.scene.add(mask,mask2,mask3)
     cursor.position.clamp(exp.cfg.cursorMinXYZ, exp.cfg.cursorMaxXYZ);
   }
 
-  function handleKeyUp(e){
-    if (e.key=='ArrowRight'){moveRight = false;}
-    if (e.key=='ArrowLeft'){moveLeft = false;}
-  }
-
-  function handleKeyDown(e){
-    if (exp.state.between("GO","FINISH")){
-      if (e.key=='ArrowRight'){moveRight = true;}
-      if (e.key=='ArrowLeft'){moveLeft = true;}
+  function handleKeyUp(e) {
+    isKeyDown = false;
+    const keyActions = {
+      'ArrowRight': () => { moveRight = { lm: false, dot: false }; },
+      'ArrowLeft': () => { moveLeft = { lm: false, dot: false }; }
+    };
+    
+    if (keyActions[e.key]) {
+      keyActions[e.key]();
     }
   }
+
+function handleKeyDown(e) {
+  isKeyDown = true;
   
-  function animate(){
-    requestAnimationFrame(animate);
-    landmarks.forEach(landmark => {
-      if (cursor.atHome){
-      if (moveLeft) {
-        landmark.position.x -= trial.stepSize;
-      }
-      if (moveRight) {
-        landmark.position.x += trial.stepSize;
-      }}
-  });
+  const keyActions = {
+    'ArrowRight': () => { moveRight = { lm: true, dot: true }; },
+    'ArrowLeft': () => { moveLeft = { lm: true, dot: true }; },
+    [config.stopKey]: () => {
+      exp.trialNumber = exp.numTrials;
+      exp.state.next('ADVANCE');
+    }
+  };
+
+  if (exp.state.between("GO", "FINISH") && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+    keyActions[e.key]();
+  }
+
+  if (e.key === config.stopKey) {
+    keyActions[config.stopKey]();
+  }
 }
 
-  animate();
+  function animate(){
+    requestAnimationFrame(animate);
+  // Get the time difference between frames
+  let deltaTime = clock.getDelta();  // Time elapsed since last frame in seconds  
+  // Define the step size that should occur over 1 second
+  const stepPerSecond = Math.abs(vaToNdC(trial.stepSize, objectDistance, config.screenHeightcm));
+  
+  // Adjust the step for the current frame based on deltaTime
+  const step = stepPerSecond * deltaTime ; // Movement per frame
+  
+    landmarks.forEach(landmark => {
+      if (cursor.atHome){
+      if (moveLeft.lm) {
+        landmark.position.x -= step;
+        
+      }
+      if (moveRight.lm) {
+        landmark.position.x += step;
+      }}
+  });
 
+  dots.forEach(dot=>{
+    if (cursor.atHome){
+      
+      if (dot.life<0){
+            setRandomPosition(dot);
+            dot.life = Math.random() * config.dotLife;
+      }
+  
+    if (moveLeft.dot) {
+      dot.life -= step;
+      dot.position.x -= step;
+    }
+    if (moveRight.dot) {
+      dot.life -= step;
+      dot.position.x += step;
+    }}
+})
+}
+animate();
 
-
-
-  // Record frame data
+// Record frame data
   function handleFrameData() {
     trial.t.push(performance.now());
     trial.state.push(exp.state.current);
