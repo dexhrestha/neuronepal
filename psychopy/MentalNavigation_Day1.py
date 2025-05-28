@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2024.2.4),
-    on Tue May 27 11:33:21 2025
+    on Thu May 29 00:20:14 2025
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -33,6 +33,13 @@ import sys  # to get file system encoding
 import psychopy.iohub as io
 from psychopy.hardware import keyboard
 
+# Run 'Before Experiment' code from expSetup_env
+# import libraries
+import random
+from psychopy import event
+#defining global variables
+
+experimentExpired = False
 # --- Setup global variables (available in all functions) ---
 # create a device manager to handle hardware (keyboards, mice, mirophones, speakers, etc.)
 deviceManager = hardware.DeviceManager()
@@ -240,16 +247,6 @@ def setupDevices(expInfo, thisExp, win):
     # --- Setup input devices ---
     ioConfig = {}
     
-    # Setup eyetracking
-    ioConfig['eyetracker.hw.mouse.EyeTracker'] = {
-        'name': 'tracker',
-        'controls': {
-            'move': [],
-            'blink':('LEFT_BUTTON',),
-            'saccade_threshold': 0.5,
-        }
-    }
-    
     # Setup iohub keyboard
     ioConfig['Keyboard'] = dict(use_keymap='psychopy')
     
@@ -261,7 +258,6 @@ def setupDevices(expInfo, thisExp, win):
     
     # store ioServer object in the device manager
     deviceManager.ioServer = ioServer
-    deviceManager.devices['eyetracker'] = ioServer.getDevice('tracker')
     
     # create a default keyboard (e.g. to check for escape)
     if deviceManager.getDevice('defaultKeyboard') is None:
@@ -273,6 +269,12 @@ def setupDevices(expInfo, thisExp, win):
         keyWelcome = deviceManager.addDevice(
             deviceClass='keyboard',
             deviceName='keyWelcome',
+        )
+    if deviceManager.getDevice('key_resp') is None:
+        # initialise key_resp
+        key_resp = deviceManager.addDevice(
+            deviceClass='keyboard',
+            deviceName='key_resp',
         )
     if deviceManager.getDevice('keyPress') is None:
         # initialise keyPress
@@ -286,11 +288,23 @@ def setupDevices(expInfo, thisExp, win):
             deviceClass='keyboard',
             deviceName='keyRelease',
         )
+    if deviceManager.getDevice('stopKey') is None:
+        # initialise stopKey
+        stopKey = deviceManager.addDevice(
+            deviceClass='keyboard',
+            deviceName='stopKey',
+        )
     if deviceManager.getDevice('key_resp_2') is None:
         # initialise key_resp_2
         key_resp_2 = deviceManager.addDevice(
             deviceClass='keyboard',
             deviceName='key_resp_2',
+        )
+    if deviceManager.getDevice('stopResp') is None:
+        # initialise stopResp
+        stopResp = deviceManager.addDevice(
+            deviceClass='keyboard',
+            deviceName='stopResp',
         )
     if deviceManager.getDevice('keyEnd') is None:
         # initialise keyEnd
@@ -401,9 +415,9 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     
     # --- Initialize components for Routine "welcome" ---
     welcomeText = visual.TextStim(win=win, name='welcomeText',
-        text='Mental Navigation Task\n\nYour goal is to reach the target image by shifting through a sequence of images using the left/right arrow keys.\n\nThe center image shows your current position. You must fixate your eyes on the fixation point in the center of the screen.\n\nOnce the fixation point turns green, press and hold a key (left/right key) once to drift left or right and try to land exactly on the target image.\n\nYou may retry if you miss, but the goal is to succeed in one press.\n\nThere are two modes in this experiment.\nVisual Mode: Images are visible as you move.\n\nMental Mode: Images are hidden—you must mentally track your position.\n\nThe sequence shifts at two speeds, indicated by the background dot movement.\n\nUse the dot cue to estimate how far each press will move the sequence.\n\nEach session lasts 60 minutes.',
+        text='Mental Navigation Task\n\nYour goal is to reach the target image by shifting through a sequence of images using the left/right arrow keys.\n\nThe center image shows your current position. You must fixate your eyes on the fixation point in the center of the screen.\n\nPress and hold a key (left/right key) once to drift left or right and try to land exactly on the target image.\n\nYou may retry if you miss, but the goal is to succeed in one press.\n\nThere are two modes in this experiment.\nVisual Mode: Images are visible as you move.\n\nMental Mode: Images are hidden—you must mentally track your position.\n\nThe sequence shifts at two speeds, indicated by the background dot movement.\n\nEach session lasts 60 minutes.',
         font='Arial',
-        pos=(0, 0), draggable=False, height=0.5, wrapWidth=None, ori=0.0, 
+        pos=(0, 0), draggable=False, height=0.75, wrapWidth=25.0, ori=0.0, 
         color='white', colorSpace='rgb', opacity=None, 
         languageStyle='LTR',
         depth=0.0);
@@ -411,8 +425,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     
     # --- Initialize components for Routine "expSetup" ---
     # Run 'Begin Experiment' code from expSetup_env
-    import random
-    from psychopy import event
+    
     
     ## Environment variables start
     imageset=1 # Image set
@@ -421,8 +434,8 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     startLandmarkY = 4# Y position of start Landmark in degrees
     targetLandmarkY =  -4# Y position of target Landmark in degrees
     interLandmarkDistance = 5# Distance between two neighboring landmarks in degrees
-    trainingStepSizes = []#speed of landmarks during training in terms of degrees per frame
-    testingStepSizes = []#speed of landmarks during testing in terms of degrees per frame
+    trainingStepSizes = [1,1.5]#speed of landmarks during training in terms of degrees per frame
+    testingStepSizes = [0.5,0.66,1,1.25,1.5,2]#speed of landmarks during testing in terms of degrees per frame
     numLandmarks = 7 # Total number of Landmarks
     tolerance = 0.25# Amount of permissible error while matching target and start Landmark
     initialTrials = 100# Number of trails as visual for day 2
@@ -430,32 +443,35 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     nDots = 100 # Number of white dots in background at any one frame
     fixationSize = (0.5,0.5) # Size of fixation dot in degree
     #dotRadius = # Size of white dots in background
-    #dotLife = # Number of frames a particular dot will be shown
-    blockSize = 2 #15 # Block is collection of Trials. Number of trials in a block
+    dotLife = 60 # Number of frames a particular dot will be shown
+    blockSize = 15 #15 # Block is collection of Trials. Number of trials in a block
     #screenHeight = # Height of screen in cm
     #objectDistance = # Distance from the eye to the screen in cm
     edgeLandmarkDistance = 12.5 # maximum distance of edge landmarks from the center
-    totalTime = 0.5*60 # total time before the experiment ends automatically 
+    totalTime = 60*60 # total time before the experiment ends automatically 
     score = 0
     currentTrialDD = 0  
+    devMode = False
     ## Environment variables end
     
-    dt = 0.167
+    dt = 0.167 # distance between lms is 10deg; this step size is for 10 deg/sec at 60 fps
+    #defining global variables
     targetReached = False
+    experimentExpired = False
     isTrain = True 
     loopName = "blockTrials"
     seed = random.randint(0,9999)
     
     random.seed(42)
     
-    # Step 1: Build distance-to-pairs dictionary
+    #Build distance-to-pairs dictionary
     all_distance_to_pairs = {
         k: [(i, j) for i in range(numLandmarks) for j in range(numLandmarks)
             if abs(i - j) == k]
         for k in range(1, numLandmarks)
     }
     
-    # Step 2: Select half of the pairs for training
+    #Select half of the pairs for training
     training_pairs = {}
     
     for k, pairs in all_distance_to_pairs.items():
@@ -463,9 +479,17 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         random.shuffle(shuffled)
         half_n = len(shuffled) // 2
         training_pairs[k] = shuffled[:half_n]
-    experimentExpired = False
     
-    # --- Initialize components for Routine "startClock" ---
+    
+    # --- Initialize components for Routine "eyeSetup" ---
+    text = visual.TextStim(win=win, name='text',
+        text='Setting up the experiment.\n\nPress space to proceed.',
+        font='Arial',
+        pos=(0, 0), draggable=False, height=1.0, wrapWidth=25.0, ori=0.0, 
+        color='white', colorSpace='rgb', opacity=None, 
+        languageStyle='LTR',
+        depth=0.0);
+    key_resp = keyboard.Keyboard(deviceName='key_resp')
     
     # --- Initialize components for Routine "blockSetup" ---
     
@@ -481,9 +505,9 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     # --- Initialize components for Routine "trial" ---
     dots = visual.DotStim(
         win=win, name='dots',units='deg', 
-        nDots=250, dotSize=3.0,
+        nDots=300, dotSize=3.0,
         speed=0.0, dir=0.0, coherence=1.0,
-        fieldPos=(0.0, 0.0), fieldSize=30.0, fieldAnchor='center', fieldShape='circle',
+        fieldPos=(0.0, 0.0), fieldSize=50.0, fieldAnchor='center', fieldShape='circle',
         signalDots='same', noiseDots='direction',dotLife=0.0,
         color=[1.0,1.0,1.0], colorSpace='rgb', opacity=None,
         depth=0.0)
@@ -495,12 +519,12 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         color=[1,1,1], colorSpace='rgb', opacity=None,
         flipHoriz=False, flipVert=False,
         texRes=128.0, interpolate=True, depth=-1.0)
-    fixationGreen = visual.ShapeStim(
-        win=win, name='fixationGreen',units='deg', 
+    fixationRedTrial = visual.ShapeStim(
+        win=win, name='fixationRedTrial',units='deg', 
         size=fixationSize, vertices='circle',
         ori=0.0, pos=(0, 0), draggable=False, anchor='center',
         lineWidth=1.0,
-        colorSpace='rgb', lineColor=[-1.0000, 1.0000, -1.0000], fillColor=[-1.0000, 1.0000, -1.0000],
+        colorSpace='rgb', lineColor=[1.0000, -1.0000, -1.0000], fillColor=[1.0000, -1.0000, -1.0000],
         opacity=None, depth=-2.0, interpolate=True)
     keyPress = keyboard.Keyboard(deviceName='keyPress')
     keyRelease = keyboard.Keyboard(deviceName='keyRelease')
@@ -511,15 +535,16 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         color=[1.0000, -1.0000, -1.0000], colorSpace='rgb', opacity=None, 
         languageStyle='LTR',
         depth=-6.0);
+    stopKey = keyboard.Keyboard(deviceName='stopKey')
     
     # --- Initialize components for Routine "reset" ---
     
     # --- Initialize components for Routine "breakRoutine" ---
     breakText = visual.TextStim(win=win, name='breakText',
-        text='End of first part of the experiment.\n\nTake a break and press space key whenever you are ready for the next part of the experiment.\n\n',
+        text='This is the end of first part of the experiment.\n\nTake a break and press space key whenever you are ready for the next part of the experiment.\n\n',
         font='Arial',
         units='deg', pos=(0,0), draggable=False, height=1.0, wrapWidth=None, ori=0.0, 
-        color=[1.0000, 1.0000, 1.0000], colorSpace='rgb', opacity=None, 
+        color=[1.0000, 1.0000, 1.0000], colorSpace='rgb', opacity=25.0, 
         languageStyle='LTR',
         depth=0.0);
     key_resp_2 = keyboard.Keyboard(deviceName='key_resp_2')
@@ -536,9 +561,9 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     # --- Initialize components for Routine "trial" ---
     dots = visual.DotStim(
         win=win, name='dots',units='deg', 
-        nDots=250, dotSize=3.0,
+        nDots=300, dotSize=3.0,
         speed=0.0, dir=0.0, coherence=1.0,
-        fieldPos=(0.0, 0.0), fieldSize=30.0, fieldAnchor='center', fieldShape='circle',
+        fieldPos=(0.0, 0.0), fieldSize=50.0, fieldAnchor='center', fieldShape='circle',
         signalDots='same', noiseDots='direction',dotLife=0.0,
         color=[1.0,1.0,1.0], colorSpace='rgb', opacity=None,
         depth=0.0)
@@ -550,12 +575,12 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         color=[1,1,1], colorSpace='rgb', opacity=None,
         flipHoriz=False, flipVert=False,
         texRes=128.0, interpolate=True, depth=-1.0)
-    fixationGreen = visual.ShapeStim(
-        win=win, name='fixationGreen',units='deg', 
+    fixationRedTrial = visual.ShapeStim(
+        win=win, name='fixationRedTrial',units='deg', 
         size=fixationSize, vertices='circle',
         ori=0.0, pos=(0, 0), draggable=False, anchor='center',
         lineWidth=1.0,
-        colorSpace='rgb', lineColor=[-1.0000, 1.0000, -1.0000], fillColor=[-1.0000, 1.0000, -1.0000],
+        colorSpace='rgb', lineColor=[1.0000, -1.0000, -1.0000], fillColor=[1.0000, -1.0000, -1.0000],
         opacity=None, depth=-2.0, interpolate=True)
     keyPress = keyboard.Keyboard(deviceName='keyPress')
     keyRelease = keyboard.Keyboard(deviceName='keyRelease')
@@ -566,8 +591,19 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         color=[1.0000, -1.0000, -1.0000], colorSpace='rgb', opacity=None, 
         languageStyle='LTR',
         depth=-6.0);
+    stopKey = keyboard.Keyboard(deviceName='stopKey')
     
     # --- Initialize components for Routine "reset" ---
+    
+    # --- Initialize components for Routine "stopEye" ---
+    text_3 = visual.TextStim(win=win, name='text_3',
+        text='Stop Eye Tracking.\n\nPress space to proceed.',
+        font='Arial',
+        pos=(0, 0), draggable=False, height=0.05, wrapWidth=None, ori=0.0, 
+        color='white', colorSpace='rgb', opacity=None, 
+        languageStyle='LTR',
+        depth=0.0);
+    stopResp = keyboard.Keyboard(deviceName='stopResp')
     
     # --- Initialize components for Routine "complete" ---
     completionText = visual.TextStim(win=win, name='completionText',
@@ -750,20 +786,24 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     continueRoutine = True
     # update component parameters for each repeat
     # Run 'Begin Routine' code from expSetup_env
-    # generarte alist of distances
+    # generarte a list of distances
     allDistances = list(range(1,numLandmarks))
+    # two list of distances for two block modes
     distances1 = [random.choice(allDistances) for _ in range(blockSize*6)]
     distances2 =  [random.choice(allDistances) for  _ in range(500)]
-    
+    # sampling from distance for two block modes
     pairs1 = [random.choice(training_pairs[distance]) for distance in distances1]
     pairs2 = [random.choice(training_pairs[distance]) for distance in distances2]
-    
+    # merge the pairs
     allPairs = pairs1+pairs2
-    
+    # randomizing pairs 
     random.seed(None)
     random.shuffle(allPairs)
-    print(allPairs)
     
+    # each block within a block mode  has different speed and visual mode
+    speedOptions = [1,1.5,1.5,1.5,1,1]
+    #speedOptions = [0.5,0.66,1,1.25,1.5,2]
+    visualModeOptions = [True,True,False,True,True,False]
     # store start times for expSetup
     expSetup.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
     expSetup.tStart = globalClock.getTime(format='float')
@@ -837,26 +877,30 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     # the Routine "expSetup" was not non-slip safe, so reset the non-slip timer
     routineTimer.reset()
     
-    # --- Prepare to start Routine "startClock" ---
-    # create an object to store info about Routine startClock
-    startClock = data.Routine(
-        name='startClock',
-        components=[],
+    # --- Prepare to start Routine "eyeSetup" ---
+    # create an object to store info about Routine eyeSetup
+    eyeSetup = data.Routine(
+        name='eyeSetup',
+        components=[text, key_resp],
     )
-    startClock.status = NOT_STARTED
+    eyeSetup.status = NOT_STARTED
     continueRoutine = True
     # update component parameters for each repeat
-    # Run 'Begin Routine' code from startClock_2
+    # create starting attributes for key_resp
+    key_resp.keys = []
+    key_resp.rt = []
+    _key_resp_allKeys = []
+    # Run 'Begin Routine' code from startClock
     expClock = core.Clock()
-    # store start times for startClock
-    startClock.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
-    startClock.tStart = globalClock.getTime(format='float')
-    startClock.status = STARTED
-    thisExp.addData('startClock.started', startClock.tStart)
-    startClock.maxDuration = None
+    # store start times for eyeSetup
+    eyeSetup.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
+    eyeSetup.tStart = globalClock.getTime(format='float')
+    eyeSetup.status = STARTED
+    thisExp.addData('eyeSetup.started', eyeSetup.tStart)
+    eyeSetup.maxDuration = None
     # keep track of which components have finished
-    startClockComponents = startClock.components
-    for thisComponent in startClock.components:
+    eyeSetupComponents = eyeSetup.components
+    for thisComponent in eyeSetup.components:
         thisComponent.tStart = None
         thisComponent.tStop = None
         thisComponent.tStartRefresh = None
@@ -868,8 +912,8 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     _timeToFirstFrame = win.getFutureFlipTime(clock="now")
     frameN = -1
     
-    # --- Run Routine "startClock" ---
-    startClock.forceEnded = routineForceEnded = not continueRoutine
+    # --- Run Routine "eyeSetup" ---
+    eyeSetup.forceEnded = routineForceEnded = not continueRoutine
     while continueRoutine:
         # get current time
         t = routineTimer.getTime()
@@ -877,6 +921,54 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         tThisFlipGlobal = win.getFutureFlipTime(clock=None)
         frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
         # update/draw components on each frame
+        
+        # *text* updates
+        
+        # if text is starting this frame...
+        if text.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+            # keep track of start time/frame for later
+            text.frameNStart = frameN  # exact frame index
+            text.tStart = t  # local t and not account for scr refresh
+            text.tStartRefresh = tThisFlipGlobal  # on global time
+            win.timeOnFlip(text, 'tStartRefresh')  # time at next scr refresh
+            # add timestamp to datafile
+            thisExp.timestampOnFlip(win, 'text.started')
+            # update status
+            text.status = STARTED
+            text.setAutoDraw(True)
+        
+        # if text is active this frame...
+        if text.status == STARTED:
+            # update params
+            pass
+        
+        # *key_resp* updates
+        waitOnFlip = False
+        
+        # if key_resp is starting this frame...
+        if key_resp.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+            # keep track of start time/frame for later
+            key_resp.frameNStart = frameN  # exact frame index
+            key_resp.tStart = t  # local t and not account for scr refresh
+            key_resp.tStartRefresh = tThisFlipGlobal  # on global time
+            win.timeOnFlip(key_resp, 'tStartRefresh')  # time at next scr refresh
+            # add timestamp to datafile
+            thisExp.timestampOnFlip(win, 'key_resp.started')
+            # update status
+            key_resp.status = STARTED
+            # keyboard checking is just starting
+            waitOnFlip = True
+            win.callOnFlip(key_resp.clock.reset)  # t=0 on next screen flip
+            win.callOnFlip(key_resp.clearEvents, eventType='keyboard')  # clear events on next screen flip
+        if key_resp.status == STARTED and not waitOnFlip:
+            theseKeys = key_resp.getKeys(keyList=['space'], ignoreKeys=["escape"], waitRelease=False)
+            _key_resp_allKeys.extend(theseKeys)
+            if len(_key_resp_allKeys):
+                key_resp.keys = _key_resp_allKeys[-1].name  # just the last key pressed
+                key_resp.rt = _key_resp_allKeys[-1].rt
+                key_resp.duration = _key_resp_allKeys[-1].duration
+                # a response ends the routine
+                continueRoutine = False
         
         # check for quit (typically the Esc key)
         if defaultKeyboard.getKeys(keyList=["escape"]):
@@ -897,10 +989,10 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         
         # check if all components have finished
         if not continueRoutine:  # a component has requested a forced-end of Routine
-            startClock.forceEnded = routineForceEnded = True
+            eyeSetup.forceEnded = routineForceEnded = True
             break
         continueRoutine = False  # will revert to True if at least one component still running
-        for thisComponent in startClock.components:
+        for thisComponent in eyeSetup.components:
             if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
                 continueRoutine = True
                 break  # at least one component has not yet finished
@@ -909,22 +1001,29 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
             win.flip()
     
-    # --- Ending Routine "startClock" ---
-    for thisComponent in startClock.components:
+    # --- Ending Routine "eyeSetup" ---
+    for thisComponent in eyeSetup.components:
         if hasattr(thisComponent, "setAutoDraw"):
             thisComponent.setAutoDraw(False)
-    # store stop times for startClock
-    startClock.tStop = globalClock.getTime(format='float')
-    startClock.tStopRefresh = tThisFlipGlobal
-    thisExp.addData('startClock.stopped', startClock.tStop)
+    # store stop times for eyeSetup
+    eyeSetup.tStop = globalClock.getTime(format='float')
+    eyeSetup.tStopRefresh = tThisFlipGlobal
+    thisExp.addData('eyeSetup.stopped', eyeSetup.tStop)
+    # check responses
+    if key_resp.keys in ['', [], None]:  # No response was made
+        key_resp.keys = None
+    thisExp.addData('key_resp.keys',key_resp.keys)
+    if key_resp.keys != None:  # we had a response
+        thisExp.addData('key_resp.rt', key_resp.rt)
+        thisExp.addData('key_resp.duration', key_resp.duration)
     thisExp.nextEntry()
-    # the Routine "startClock" was not non-slip safe, so reset the non-slip timer
+    # the Routine "eyeSetup" was not non-slip safe, so reset the non-slip timer
     routineTimer.reset()
     
     # set up handler to look after randomisation of conditions etc
     blockTrials = data.TrialHandler2(
         name='blockTrials',
-        nReps=6.0, 
+        nReps=len(speedOptions), 
         method='random', 
         extraInfo=expInfo, 
         originPath=-1, 
@@ -962,10 +1061,6 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         continueRoutine = True
         # update component parameters for each repeat
         # Run 'Begin Routine' code from blockSetup_2
-        speedOptions = [1,1.5,1.5,1.5,1,1]
-        #speedOptions = [0.5,0.75,1,1.25,1.5,1.75]
-        visualModeOptions = [True,True,False,True,True,False]
-        
         visualMode= visualModeOptions[blockTrials.thisN]
         speed = speedOptions[blockTrials.thisN]
         # store start times for blockSetup
@@ -1084,41 +1179,55 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             continueRoutine = True
             # update component parameters for each repeat
             # Run 'Begin Routine' code from initializationCode
-            
             dots.speed = 0
             dots.dotLife = -1
             
             random.seed(None)
+             
+            startId = allPairs[currentTrialDD][0]
+            targetId = allPairs[currentTrialDD][1]
             
-            #distance_to_pairs = training_pairs if isTrain else all_distance_to_pairs
+            targetReached = False
+            landmarks = []
+            dotsArray = []
             
-            #distance  = random.randint(1,numLandmarks-1)
-            #pairList = distance_to_pairs[distance].copy()
-            #random.shuffle(allPairs)
+            for i in range(numLandmarks):
+                # Create image
+                lm = visual.ImageStim(
+                    win=win,
+                    name=str(i), units='deg', 
+                    image=f'public/landmarks/images/imageset1/{i}.jpg', mask=None, anchor='center',
+                    ori=0.0, pos=[0, 0], draggable=False, size=(landmarkWidth, landmarkHeight),
+                    color=[1,1,1], colorSpace='rgb', opacity=None,
+                    flipHoriz=False, flipVert=False,
+                    texRes=128.0, interpolate=True, depth=0.0  # higher depth: behind
+                )
             
-            #currentPair = random.choice(pairList)
+                # Position it
+                lm.pos = ((i - startId) * (landmarkWidth + interLandmarkDistance), startLandmarkY)
+                lm.idx = i
+                if not visualMode and i not in [startId-1, startId, startId+1]:
+                    lm.opacity = 0
             
-            #startId = currentPair[0]
-            #targetId =  currentPair[1]
-            #startId = allPairs[currentTrialDD][0]
-            #targetId = allPairs[currentTrialDD][1]
-            startId = 1
-            targetId = 2
+                # Create and position dot in front
+                dot = visual.Circle(
+                    win=win,
+                    radius=0.1,
+                    fillColor='red',
+                    lineColor='red',
+                    units='deg',
+                    pos=lm.pos,
+                    opacity=lm.opacity,
+                    depth=-1.0  # lower depth: in front of image
+                )
             
-            landmarks = [visual.ImageStim(
-                win=win,
-                name=str(i), units='deg', 
-                image=f'public/landmarks/images/imageset1/{i}.jpg', mask=None, anchor='center',
-                ori=0.0, pos=[0,0], draggable=False, size=(landmarkWidth, landmarkHeight),
-                color=[1,1,1], colorSpace='rgb', opacity=None,
-                flipHoriz=False, flipVert=False,
-                texRes=128.0, interpolate=True, depth=-1.0) 
-                for i in range(numLandmarks)
-                ]
-            
-            for index,lm in enumerate(landmarks):
-                lm.pos = ((index - startId) * (landmarkWidth + interLandmarkDistance),startLandmarkY)
+                # Draw order: dot AFTER image, but dot has lower depth = in front
                 lm.setAutoDraw(True)
+                dot.setAutoDraw(True)
+            
+                landmarks.append(lm)
+                dotsArray.append(dot)
+            
             # store start times for setup
             setup.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
             setup.tStart = globalClock.getTime(format='float')
@@ -1257,7 +1366,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                 # create an object to store info about Routine trial
                 trial = data.Routine(
                     name='trial',
-                    components=[dots, targetLandmark, fixationGreen, keyPress, keyRelease, timeText],
+                    components=[dots, targetLandmark, fixationRedTrial, keyPress, keyRelease, timeText, stopKey],
                 )
                 trial.status = NOT_STARTED
                 continueRoutine = True
@@ -1276,9 +1385,23 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                 ## add logic to  add all images on a line
                 dots.speed = 0
                 dots.dotLife = -1
+                closestLMs = sorted(landmarks,key=lambda x:abs(x.pos[0]),reverse=False)
+                if visualMode:
+                    for index,lm  in  enumerate(closestLMs):
+                        lm.opacity = 1  
+                        dotsArray[lm.idx].opacity = 1
+                else:
+                    closestLMs[0].opacity = 1
+                    dotsArray[closestLMs[0].idx].opacity = 1
+                    closestIdx = closestLMs[0].idx
+                    leftLM = landmarks[closestIdx-1] if closestIdx>0 else landmarks[closestIdx]
+                    leftLM.opacity = 1
+                    dotsArray[leftLM.idx].opacity = 1
+                    rightLM = landmarks[closestIdx+1] if closestIdx<6 else landmarks[closestIdx]
+                    rightLM.opacity = 1
+                    dotsArray[rightLM.idx].opacity = 1
                 
-                for lm  in  landmarks:
-                    lm.opacity = 1
+                    
                 targetLandmark.opacity = 1
                         
                 targetLandmark.image = f'public/landmarks/images/imageset1/{targetId}.jpg'
@@ -1290,6 +1413,10 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     score += 1
                     continueRoutine = False
                     
+                # create starting attributes for stopKey
+                stopKey.keys = []
+                stopKey.rt = []
+                _stopKey_allKeys = []
                 # store start times for trial
                 trial.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
                 trial.tStart = globalClock.getTime(format='float')
@@ -1363,23 +1490,23 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                         # update params
                         pass
                     
-                    # *fixationGreen* updates
+                    # *fixationRedTrial* updates
                     
-                    # if fixationGreen is starting this frame...
-                    if fixationGreen.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+                    # if fixationRedTrial is starting this frame...
+                    if fixationRedTrial.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
                         # keep track of start time/frame for later
-                        fixationGreen.frameNStart = frameN  # exact frame index
-                        fixationGreen.tStart = t  # local t and not account for scr refresh
-                        fixationGreen.tStartRefresh = tThisFlipGlobal  # on global time
-                        win.timeOnFlip(fixationGreen, 'tStartRefresh')  # time at next scr refresh
+                        fixationRedTrial.frameNStart = frameN  # exact frame index
+                        fixationRedTrial.tStart = t  # local t and not account for scr refresh
+                        fixationRedTrial.tStartRefresh = tThisFlipGlobal  # on global time
+                        win.timeOnFlip(fixationRedTrial, 'tStartRefresh')  # time at next scr refresh
                         # add timestamp to datafile
-                        thisExp.timestampOnFlip(win, 'fixationGreen.started')
+                        thisExp.timestampOnFlip(win, 'fixationRedTrial.started')
                         # update status
-                        fixationGreen.status = STARTED
-                        fixationGreen.setAutoDraw(True)
+                        fixationRedTrial.status = STARTED
+                        fixationRedTrial.setAutoDraw(True)
                     
-                    # if fixationGreen is active this frame...
-                    if fixationGreen.status == STARTED:
+                    # if fixationRedTrial is active this frame...
+                    if fixationRedTrial.status == STARTED:
                         # update params
                         pass
                     
@@ -1437,18 +1564,22 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                             # a response ends the routine
                             continueRoutine = False
                     # Run 'Each Frame' code from move_images
-                    ## add logic to  move the image for each frame 
-                    speed = 1
-                    dt = 0.1
-                    completedTrials = 0 
-                    
+                    ## add logic to  move the image for each frame   
                     if loopName == "blockTrials":
                         completedTrials  = blockTrials.thisN
                     elif loopName == "blockTrials_2":
                         completedTrials = blockTrials_2.thisN
+                    
+                    if devMode:    
+                        statusText = f"Current Time : {str(int(expClock.getTime()))} \n Completed Trials:{completedTrials}/{currentTrialDD} \n Score: {score} \n Speed: {speed} \n Step Size : {dt}" 
+                    else:
+                        statusText = ''
                         
-                    statusttext = f"Current Time : {str(int(expClock.getTime()))} \n Completed Trials:{completedTrials} \n Score: {score}"
-                    timeText.setText(statusttext)
+                    timeText.setText(statusText)
+                    
+                    if stopKey.keys == 's':
+                        experimentExpired = True
+                        
                     if  keyRelease.keys == 'left' or keyRelease.keys == 'right':
                         targetReached = abs(landmarks[targetId].pos[0])   <= tolerance * landmarkWidth
                         dots.dir =  0
@@ -1457,8 +1588,9 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                         
                     if keyPress.keys == 'left' or keyPress.keys  == 'right':
                         if not visualMode:
-                            for lm  in  landmarks:
+                            for lm in  landmarks:
                                 lm.opacity = 0
+                                dotsArray[lm.idx].opacity = 0
                             targetLandmark.opacity = 0
                             
                     if  keyPress.keys == 'left':
@@ -1467,13 +1599,14 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                             if  landmarks[-1].pos[0]<-1*edgeLandmarkDistance:
                                 break
                             lm.pos -= (speed*dt,0)
+                            dotsArray[lm.idx].pos -= (speed*dt,0)
                     
                         if  landmarks[-1].pos[0]<-1*edgeLandmarkDistance:
                             dots.speed = 0
                             dots.dotLife = -1
                         else:
-                            dots.speed =  dt
-                            dots.dotLife = 60
+                            dots.speed =  speed*dt
+                            dots.dotLife = dotLife
                         
                     elif  keyPress.keys == 'right':
                         dots.dir = 0
@@ -1481,12 +1614,13 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                             if  landmarks[0].pos[0]>edgeLandmarkDistance:
                                 break
                             lm.pos += (speed*dt,0)
+                            dotsArray[lm.idx].pos += (speed*dt,0)
                         if  landmarks[0].pos[0]>edgeLandmarkDistance:
                             dots.speed = 0
                             dots.dotLife = -1
                         else:
-                            dots.speed =  dt
-                            dots.dotLife = 60
+                            dots.speed =  speed*dt
+                            dots.dotLife = dotLife
                     
                      
                     
@@ -1511,6 +1645,34 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     if timeText.status == STARTED:
                         # update params
                         pass
+                    
+                    # *stopKey* updates
+                    waitOnFlip = False
+                    
+                    # if stopKey is starting this frame...
+                    if stopKey.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+                        # keep track of start time/frame for later
+                        stopKey.frameNStart = frameN  # exact frame index
+                        stopKey.tStart = t  # local t and not account for scr refresh
+                        stopKey.tStartRefresh = tThisFlipGlobal  # on global time
+                        win.timeOnFlip(stopKey, 'tStartRefresh')  # time at next scr refresh
+                        # add timestamp to datafile
+                        thisExp.timestampOnFlip(win, 'stopKey.started')
+                        # update status
+                        stopKey.status = STARTED
+                        # keyboard checking is just starting
+                        waitOnFlip = True
+                        win.callOnFlip(stopKey.clock.reset)  # t=0 on next screen flip
+                        win.callOnFlip(stopKey.clearEvents, eventType='keyboard')  # clear events on next screen flip
+                    if stopKey.status == STARTED and not waitOnFlip:
+                        theseKeys = stopKey.getKeys(keyList=['s'], ignoreKeys=["escape"], waitRelease=False)
+                        _stopKey_allKeys.extend(theseKeys)
+                        if len(_stopKey_allKeys):
+                            stopKey.keys = _stopKey_allKeys[-1].name  # just the last key pressed
+                            stopKey.rt = _stopKey_allKeys[-1].rt
+                            stopKey.duration = _stopKey_allKeys[-1].duration
+                            # a response ends the routine
+                            continueRoutine = False
                     
                     # check for quit (typically the Esc key)
                     if defaultKeyboard.getKeys(keyList=["escape"]):
@@ -1567,6 +1729,13 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     responseBlock.addData('keyRelease.duration', keyRelease.duration)
                 # Run 'End Routine' code from move_images
                 ## check if start and target is same
+                # check responses
+                if stopKey.keys in ['', [], None]:  # No response was made
+                    stopKey.keys = None
+                responseBlock.addData('stopKey.keys',stopKey.keys)
+                if stopKey.keys != None:  # we had a response
+                    responseBlock.addData('stopKey.rt', stopKey.rt)
+                    responseBlock.addData('stopKey.duration', stopKey.duration)
                 # the Routine "trial" was not non-slip safe, so reset the non-slip timer
                 routineTimer.reset()
             # completed 2.0 repeats of 'responseBlock'
@@ -1582,11 +1751,17 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             continueRoutine = True
             # update component parameters for each repeat
             # Run 'Begin Routine' code from resetCode
-            for lm in landmarks:
+            #core.wait(0.5)
+            
+            for index,lm in enumerate(landmarks):
                 lm.opacity = 0
-                del lm
+                dotsArray[index].opacity = 0
+            #    del lm
+            #    del dotsArray[index]
             del landmarks
-            #core.wait(0.2)
+            del dotsArray
+            
+            
             eyeRecord = False
             
             if expClock.getTime()>=totalTime:
@@ -1692,7 +1867,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             thisSession.sendExperimentData()
         thisExp.nextEntry()
         
-    # completed 6.0 repeats of 'blockTrials'
+    # completed len(speedOptions) repeats of 'blockTrials'
     
     if thisSession is not None:
         # if running in a Session with a Liaison client, send data up to now
@@ -1710,6 +1885,10 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     # Run 'Begin Routine' code from blockSetup_3
     visualMode =True
     loopName =  "blockTrials_2"
+    
+    random.seed(42)
+    trainingSpeeds = [s for _ in range(100) for s in testingStepSizes]
+    random.shuffle(trainingSpeeds)
     # create starting attributes for key_resp_2
     key_resp_2.keys = []
     key_resp_2.rt = []
@@ -1845,7 +2024,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     # set up handler to look after randomisation of conditions etc
     blockTrials_2 = data.TrialHandler2(
         name='blockTrials_2',
-        nReps=100.0, 
+        nReps=0.0, 
         method='random', 
         extraInfo=expInfo, 
         originPath=-1, 
@@ -1883,41 +2062,55 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         continueRoutine = True
         # update component parameters for each repeat
         # Run 'Begin Routine' code from initializationCode
-        
         dots.speed = 0
         dots.dotLife = -1
         
         random.seed(None)
+         
+        startId = allPairs[currentTrialDD][0]
+        targetId = allPairs[currentTrialDD][1]
         
-        #distance_to_pairs = training_pairs if isTrain else all_distance_to_pairs
+        targetReached = False
+        landmarks = []
+        dotsArray = []
         
-        #distance  = random.randint(1,numLandmarks-1)
-        #pairList = distance_to_pairs[distance].copy()
-        #random.shuffle(allPairs)
+        for i in range(numLandmarks):
+            # Create image
+            lm = visual.ImageStim(
+                win=win,
+                name=str(i), units='deg', 
+                image=f'public/landmarks/images/imageset1/{i}.jpg', mask=None, anchor='center',
+                ori=0.0, pos=[0, 0], draggable=False, size=(landmarkWidth, landmarkHeight),
+                color=[1,1,1], colorSpace='rgb', opacity=None,
+                flipHoriz=False, flipVert=False,
+                texRes=128.0, interpolate=True, depth=0.0  # higher depth: behind
+            )
         
-        #currentPair = random.choice(pairList)
+            # Position it
+            lm.pos = ((i - startId) * (landmarkWidth + interLandmarkDistance), startLandmarkY)
+            lm.idx = i
+            if not visualMode and i not in [startId-1, startId, startId+1]:
+                lm.opacity = 0
         
-        #startId = currentPair[0]
-        #targetId =  currentPair[1]
-        #startId = allPairs[currentTrialDD][0]
-        #targetId = allPairs[currentTrialDD][1]
-        startId = 1
-        targetId = 2
+            # Create and position dot in front
+            dot = visual.Circle(
+                win=win,
+                radius=0.1,
+                fillColor='red',
+                lineColor='red',
+                units='deg',
+                pos=lm.pos,
+                opacity=lm.opacity,
+                depth=-1.0  # lower depth: in front of image
+            )
         
-        landmarks = [visual.ImageStim(
-            win=win,
-            name=str(i), units='deg', 
-            image=f'public/landmarks/images/imageset1/{i}.jpg', mask=None, anchor='center',
-            ori=0.0, pos=[0,0], draggable=False, size=(landmarkWidth, landmarkHeight),
-            color=[1,1,1], colorSpace='rgb', opacity=None,
-            flipHoriz=False, flipVert=False,
-            texRes=128.0, interpolate=True, depth=-1.0) 
-            for i in range(numLandmarks)
-            ]
-        
-        for index,lm in enumerate(landmarks):
-            lm.pos = ((index - startId) * (landmarkWidth + interLandmarkDistance),startLandmarkY)
+            # Draw order: dot AFTER image, but dot has lower depth = in front
             lm.setAutoDraw(True)
+            dot.setAutoDraw(True)
+        
+            landmarks.append(lm)
+            dotsArray.append(dot)
+        
         # store start times for setup
         setup.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
         setup.tStart = globalClock.getTime(format='float')
@@ -2056,7 +2249,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             # create an object to store info about Routine trial
             trial = data.Routine(
                 name='trial',
-                components=[dots, targetLandmark, fixationGreen, keyPress, keyRelease, timeText],
+                components=[dots, targetLandmark, fixationRedTrial, keyPress, keyRelease, timeText, stopKey],
             )
             trial.status = NOT_STARTED
             continueRoutine = True
@@ -2075,9 +2268,23 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             ## add logic to  add all images on a line
             dots.speed = 0
             dots.dotLife = -1
+            closestLMs = sorted(landmarks,key=lambda x:abs(x.pos[0]),reverse=False)
+            if visualMode:
+                for index,lm  in  enumerate(closestLMs):
+                    lm.opacity = 1  
+                    dotsArray[lm.idx].opacity = 1
+            else:
+                closestLMs[0].opacity = 1
+                dotsArray[closestLMs[0].idx].opacity = 1
+                closestIdx = closestLMs[0].idx
+                leftLM = landmarks[closestIdx-1] if closestIdx>0 else landmarks[closestIdx]
+                leftLM.opacity = 1
+                dotsArray[leftLM.idx].opacity = 1
+                rightLM = landmarks[closestIdx+1] if closestIdx<6 else landmarks[closestIdx]
+                rightLM.opacity = 1
+                dotsArray[rightLM.idx].opacity = 1
             
-            for lm  in  landmarks:
-                lm.opacity = 1
+                
             targetLandmark.opacity = 1
                     
             targetLandmark.image = f'public/landmarks/images/imageset1/{targetId}.jpg'
@@ -2089,6 +2296,10 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                 score += 1
                 continueRoutine = False
                 
+            # create starting attributes for stopKey
+            stopKey.keys = []
+            stopKey.rt = []
+            _stopKey_allKeys = []
             # store start times for trial
             trial.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
             trial.tStart = globalClock.getTime(format='float')
@@ -2162,23 +2373,23 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     # update params
                     pass
                 
-                # *fixationGreen* updates
+                # *fixationRedTrial* updates
                 
-                # if fixationGreen is starting this frame...
-                if fixationGreen.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+                # if fixationRedTrial is starting this frame...
+                if fixationRedTrial.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
                     # keep track of start time/frame for later
-                    fixationGreen.frameNStart = frameN  # exact frame index
-                    fixationGreen.tStart = t  # local t and not account for scr refresh
-                    fixationGreen.tStartRefresh = tThisFlipGlobal  # on global time
-                    win.timeOnFlip(fixationGreen, 'tStartRefresh')  # time at next scr refresh
+                    fixationRedTrial.frameNStart = frameN  # exact frame index
+                    fixationRedTrial.tStart = t  # local t and not account for scr refresh
+                    fixationRedTrial.tStartRefresh = tThisFlipGlobal  # on global time
+                    win.timeOnFlip(fixationRedTrial, 'tStartRefresh')  # time at next scr refresh
                     # add timestamp to datafile
-                    thisExp.timestampOnFlip(win, 'fixationGreen.started')
+                    thisExp.timestampOnFlip(win, 'fixationRedTrial.started')
                     # update status
-                    fixationGreen.status = STARTED
-                    fixationGreen.setAutoDraw(True)
+                    fixationRedTrial.status = STARTED
+                    fixationRedTrial.setAutoDraw(True)
                 
-                # if fixationGreen is active this frame...
-                if fixationGreen.status == STARTED:
+                # if fixationRedTrial is active this frame...
+                if fixationRedTrial.status == STARTED:
                     # update params
                     pass
                 
@@ -2236,18 +2447,22 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                         # a response ends the routine
                         continueRoutine = False
                 # Run 'Each Frame' code from move_images
-                ## add logic to  move the image for each frame 
-                speed = 1
-                dt = 0.1
-                completedTrials = 0 
-                
+                ## add logic to  move the image for each frame   
                 if loopName == "blockTrials":
                     completedTrials  = blockTrials.thisN
                 elif loopName == "blockTrials_2":
                     completedTrials = blockTrials_2.thisN
+                
+                if devMode:    
+                    statusText = f"Current Time : {str(int(expClock.getTime()))} \n Completed Trials:{completedTrials}/{currentTrialDD} \n Score: {score} \n Speed: {speed} \n Step Size : {dt}" 
+                else:
+                    statusText = ''
                     
-                statusttext = f"Current Time : {str(int(expClock.getTime()))} \n Completed Trials:{completedTrials} \n Score: {score}"
-                timeText.setText(statusttext)
+                timeText.setText(statusText)
+                
+                if stopKey.keys == 's':
+                    experimentExpired = True
+                    
                 if  keyRelease.keys == 'left' or keyRelease.keys == 'right':
                     targetReached = abs(landmarks[targetId].pos[0])   <= tolerance * landmarkWidth
                     dots.dir =  0
@@ -2256,8 +2471,9 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     
                 if keyPress.keys == 'left' or keyPress.keys  == 'right':
                     if not visualMode:
-                        for lm  in  landmarks:
+                        for lm in  landmarks:
                             lm.opacity = 0
+                            dotsArray[lm.idx].opacity = 0
                         targetLandmark.opacity = 0
                         
                 if  keyPress.keys == 'left':
@@ -2266,13 +2482,14 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                         if  landmarks[-1].pos[0]<-1*edgeLandmarkDistance:
                             break
                         lm.pos -= (speed*dt,0)
+                        dotsArray[lm.idx].pos -= (speed*dt,0)
                 
                     if  landmarks[-1].pos[0]<-1*edgeLandmarkDistance:
                         dots.speed = 0
                         dots.dotLife = -1
                     else:
-                        dots.speed =  dt
-                        dots.dotLife = 60
+                        dots.speed =  speed*dt
+                        dots.dotLife = dotLife
                     
                 elif  keyPress.keys == 'right':
                     dots.dir = 0
@@ -2280,12 +2497,13 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                         if  landmarks[0].pos[0]>edgeLandmarkDistance:
                             break
                         lm.pos += (speed*dt,0)
+                        dotsArray[lm.idx].pos += (speed*dt,0)
                     if  landmarks[0].pos[0]>edgeLandmarkDistance:
                         dots.speed = 0
                         dots.dotLife = -1
                     else:
-                        dots.speed =  dt
-                        dots.dotLife = 60
+                        dots.speed =  speed*dt
+                        dots.dotLife = dotLife
                 
                  
                 
@@ -2310,6 +2528,34 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                 if timeText.status == STARTED:
                     # update params
                     pass
+                
+                # *stopKey* updates
+                waitOnFlip = False
+                
+                # if stopKey is starting this frame...
+                if stopKey.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+                    # keep track of start time/frame for later
+                    stopKey.frameNStart = frameN  # exact frame index
+                    stopKey.tStart = t  # local t and not account for scr refresh
+                    stopKey.tStartRefresh = tThisFlipGlobal  # on global time
+                    win.timeOnFlip(stopKey, 'tStartRefresh')  # time at next scr refresh
+                    # add timestamp to datafile
+                    thisExp.timestampOnFlip(win, 'stopKey.started')
+                    # update status
+                    stopKey.status = STARTED
+                    # keyboard checking is just starting
+                    waitOnFlip = True
+                    win.callOnFlip(stopKey.clock.reset)  # t=0 on next screen flip
+                    win.callOnFlip(stopKey.clearEvents, eventType='keyboard')  # clear events on next screen flip
+                if stopKey.status == STARTED and not waitOnFlip:
+                    theseKeys = stopKey.getKeys(keyList=['s'], ignoreKeys=["escape"], waitRelease=False)
+                    _stopKey_allKeys.extend(theseKeys)
+                    if len(_stopKey_allKeys):
+                        stopKey.keys = _stopKey_allKeys[-1].name  # just the last key pressed
+                        stopKey.rt = _stopKey_allKeys[-1].rt
+                        stopKey.duration = _stopKey_allKeys[-1].duration
+                        # a response ends the routine
+                        continueRoutine = False
                 
                 # check for quit (typically the Esc key)
                 if defaultKeyboard.getKeys(keyList=["escape"]):
@@ -2366,6 +2612,13 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                 responseBlock_2.addData('keyRelease.duration', keyRelease.duration)
             # Run 'End Routine' code from move_images
             ## check if start and target is same
+            # check responses
+            if stopKey.keys in ['', [], None]:  # No response was made
+                stopKey.keys = None
+            responseBlock_2.addData('stopKey.keys',stopKey.keys)
+            if stopKey.keys != None:  # we had a response
+                responseBlock_2.addData('stopKey.rt', stopKey.rt)
+                responseBlock_2.addData('stopKey.duration', stopKey.duration)
             # the Routine "trial" was not non-slip safe, so reset the non-slip timer
             routineTimer.reset()
         # completed 2.0 repeats of 'responseBlock_2'
@@ -2381,11 +2634,17 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         continueRoutine = True
         # update component parameters for each repeat
         # Run 'Begin Routine' code from resetCode
-        for lm in landmarks:
+        #core.wait(0.5)
+        
+        for index,lm in enumerate(landmarks):
             lm.opacity = 0
-            del lm
+            dotsArray[index].opacity = 0
+        #    del lm
+        #    del dotsArray[index]
         del landmarks
-        #core.wait(0.2)
+        del dotsArray
+        
+        
         eyeRecord = False
         
         if expClock.getTime()>=totalTime:
@@ -2484,11 +2743,150 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         routineTimer.reset()
         thisExp.nextEntry()
         
-    # completed 100.0 repeats of 'blockTrials_2'
+    # completed 0.0 repeats of 'blockTrials_2'
     
     if thisSession is not None:
         # if running in a Session with a Liaison client, send data up to now
         thisSession.sendExperimentData()
+    
+    # --- Prepare to start Routine "stopEye" ---
+    # create an object to store info about Routine stopEye
+    stopEye = data.Routine(
+        name='stopEye',
+        components=[text_3, stopResp],
+    )
+    stopEye.status = NOT_STARTED
+    continueRoutine = True
+    # update component parameters for each repeat
+    # create starting attributes for stopResp
+    stopResp.keys = []
+    stopResp.rt = []
+    _stopResp_allKeys = []
+    # store start times for stopEye
+    stopEye.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
+    stopEye.tStart = globalClock.getTime(format='float')
+    stopEye.status = STARTED
+    stopEye.maxDuration = None
+    # keep track of which components have finished
+    stopEyeComponents = stopEye.components
+    for thisComponent in stopEye.components:
+        thisComponent.tStart = None
+        thisComponent.tStop = None
+        thisComponent.tStartRefresh = None
+        thisComponent.tStopRefresh = None
+        if hasattr(thisComponent, 'status'):
+            thisComponent.status = NOT_STARTED
+    # reset timers
+    t = 0
+    _timeToFirstFrame = win.getFutureFlipTime(clock="now")
+    frameN = -1
+    
+    # --- Run Routine "stopEye" ---
+    stopEye.forceEnded = routineForceEnded = not continueRoutine
+    while continueRoutine:
+        # get current time
+        t = routineTimer.getTime()
+        tThisFlip = win.getFutureFlipTime(clock=routineTimer)
+        tThisFlipGlobal = win.getFutureFlipTime(clock=None)
+        frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
+        # update/draw components on each frame
+        
+        # *text_3* updates
+        
+        # if text_3 is starting this frame...
+        if text_3.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+            # keep track of start time/frame for later
+            text_3.frameNStart = frameN  # exact frame index
+            text_3.tStart = t  # local t and not account for scr refresh
+            text_3.tStartRefresh = tThisFlipGlobal  # on global time
+            win.timeOnFlip(text_3, 'tStartRefresh')  # time at next scr refresh
+            # add timestamp to datafile
+            thisExp.timestampOnFlip(win, 'text_3.started')
+            # update status
+            text_3.status = STARTED
+            text_3.setAutoDraw(True)
+        
+        # if text_3 is active this frame...
+        if text_3.status == STARTED:
+            # update params
+            pass
+        
+        # *stopResp* updates
+        waitOnFlip = False
+        
+        # if stopResp is starting this frame...
+        if stopResp.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+            # keep track of start time/frame for later
+            stopResp.frameNStart = frameN  # exact frame index
+            stopResp.tStart = t  # local t and not account for scr refresh
+            stopResp.tStartRefresh = tThisFlipGlobal  # on global time
+            win.timeOnFlip(stopResp, 'tStartRefresh')  # time at next scr refresh
+            # add timestamp to datafile
+            thisExp.timestampOnFlip(win, 'stopResp.started')
+            # update status
+            stopResp.status = STARTED
+            # keyboard checking is just starting
+            waitOnFlip = True
+            win.callOnFlip(stopResp.clock.reset)  # t=0 on next screen flip
+            win.callOnFlip(stopResp.clearEvents, eventType='keyboard')  # clear events on next screen flip
+        if stopResp.status == STARTED and not waitOnFlip:
+            theseKeys = stopResp.getKeys(keyList=['space'], ignoreKeys=["escape"], waitRelease=False)
+            _stopResp_allKeys.extend(theseKeys)
+            if len(_stopResp_allKeys):
+                stopResp.keys = _stopResp_allKeys[-1].name  # just the last key pressed
+                stopResp.rt = _stopResp_allKeys[-1].rt
+                stopResp.duration = _stopResp_allKeys[-1].duration
+                # a response ends the routine
+                continueRoutine = False
+        
+        # check for quit (typically the Esc key)
+        if defaultKeyboard.getKeys(keyList=["escape"]):
+            thisExp.status = FINISHED
+        if thisExp.status == FINISHED or endExpNow:
+            endExperiment(thisExp, win=win)
+            return
+        # pause experiment here if requested
+        if thisExp.status == PAUSED:
+            pauseExperiment(
+                thisExp=thisExp, 
+                win=win, 
+                timers=[routineTimer], 
+                playbackComponents=[]
+            )
+            # skip the frame we paused on
+            continue
+        
+        # check if all components have finished
+        if not continueRoutine:  # a component has requested a forced-end of Routine
+            stopEye.forceEnded = routineForceEnded = True
+            break
+        continueRoutine = False  # will revert to True if at least one component still running
+        for thisComponent in stopEye.components:
+            if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
+                continueRoutine = True
+                break  # at least one component has not yet finished
+        
+        # refresh the screen
+        if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
+            win.flip()
+    
+    # --- Ending Routine "stopEye" ---
+    for thisComponent in stopEye.components:
+        if hasattr(thisComponent, "setAutoDraw"):
+            thisComponent.setAutoDraw(False)
+    # store stop times for stopEye
+    stopEye.tStop = globalClock.getTime(format='float')
+    stopEye.tStopRefresh = tThisFlipGlobal
+    # check responses
+    if stopResp.keys in ['', [], None]:  # No response was made
+        stopResp.keys = None
+    thisExp.addData('stopResp.keys',stopResp.keys)
+    if stopResp.keys != None:  # we had a response
+        thisExp.addData('stopResp.rt', stopResp.rt)
+        thisExp.addData('stopResp.duration', stopResp.duration)
+    thisExp.nextEntry()
+    # the Routine "stopEye" was not non-slip safe, so reset the non-slip timer
+    routineTimer.reset()
     
     # --- Prepare to start Routine "complete" ---
     # create an object to store info about Routine complete
@@ -2706,6 +3104,7 @@ def quit(thisExp, win=None, thisSession=None):
 # if running this experiment as a script...
 if __name__ == '__main__':
     # call all functions in order
+    expInfo = showExpInfoDlg(expInfo=expInfo)
     thisExp = setupData(expInfo=expInfo)
     logFile = setupLogging(filename=thisExp.dataFileName)
     win = setupWindow(expInfo=expInfo)
