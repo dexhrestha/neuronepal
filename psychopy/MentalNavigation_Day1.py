@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2024.2.4),
-    on Thu May 29 00:20:14 2025
+    on Thu May 29 00:51:52 2025
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -444,7 +444,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     fixationSize = (0.5,0.5) # Size of fixation dot in degree
     #dotRadius = # Size of white dots in background
     dotLife = 60 # Number of frames a particular dot will be shown
-    blockSize = 15 #15 # Block is collection of Trials. Number of trials in a block
+    blockSize = 2 #15 # Block is collection of Trials. Number of trials in a block
     #screenHeight = # Height of screen in cm
     #objectDistance = # Distance from the eye to the screen in cm
     edgeLandmarkDistance = 12.5 # maximum distance of edge landmarks from the center
@@ -599,7 +599,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     text_3 = visual.TextStim(win=win, name='text_3',
         text='Stop Eye Tracking.\n\nPress space to proceed.',
         font='Arial',
-        pos=(0, 0), draggable=False, height=0.05, wrapWidth=None, ori=0.0, 
+        pos=(0, 0), draggable=False, height=1.0, wrapWidth=None, ori=0.0, 
         color='white', colorSpace='rgb', opacity=None, 
         languageStyle='LTR',
         depth=0.0);
@@ -1227,7 +1227,6 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             
                 landmarks.append(lm)
                 dotsArray.append(dot)
-            
             # store start times for setup
             setup.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
             setup.tStart = globalClock.getTime(format='float')
@@ -1758,8 +1757,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                 dotsArray[index].opacity = 0
             #    del lm
             #    del dotsArray[index]
-            del landmarks
-            del dotsArray
+            
             
             
             eyeRecord = False
@@ -1856,6 +1854,22 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             
             
             currentTrialDD+=1
+            
+            thisExp.addData('speed',speed)
+            thisExp.addData('stepSize',dt)
+            thisExp.addData('speed',speed)
+            thisExp.addData('startId',startId)
+            thisExp.addData('targetId',targetId)
+            thisExp.addData('startLandmarkPos',landmarks[startId].pos)
+            thisExp.addData('experimentExpired',experimentExpired)
+            thisExp.addData('visualMode',visualMode)
+            thisExp.addData('devMode',devMode)
+            thisExp.addData(f'{loopName}_duration',expClock.getTime())
+            
+            
+            del landmarks
+            del dotsArray
+            
             # the Routine "reset" was not non-slip safe, so reset the non-slip timer
             routineTimer.reset()
             thisExp.nextEntry()
@@ -2110,7 +2124,6 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         
             landmarks.append(lm)
             dotsArray.append(dot)
-        
         # store start times for setup
         setup.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
         setup.tStart = globalClock.getTime(format='float')
@@ -2641,8 +2654,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             dotsArray[index].opacity = 0
         #    del lm
         #    del dotsArray[index]
-        del landmarks
-        del dotsArray
+        
         
         
         eyeRecord = False
@@ -2739,6 +2751,22 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         
         
         currentTrialDD+=1
+        
+        thisExp.addData('speed',speed)
+        thisExp.addData('stepSize',dt)
+        thisExp.addData('speed',speed)
+        thisExp.addData('startId',startId)
+        thisExp.addData('targetId',targetId)
+        thisExp.addData('startLandmarkPos',landmarks[startId].pos)
+        thisExp.addData('experimentExpired',experimentExpired)
+        thisExp.addData('visualMode',visualMode)
+        thisExp.addData('devMode',devMode)
+        thisExp.addData(f'{loopName}_duration',expClock.getTime())
+        
+        
+        del landmarks
+        del dotsArray
+        
         # the Routine "reset" was not non-slip safe, so reset the non-slip timer
         routineTimer.reset()
         thisExp.nextEntry()
