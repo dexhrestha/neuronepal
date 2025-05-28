@@ -1,1 +1,6 @@
 .DS_Store
+data/
+Python/
+results/
+*_lastrun.py
+*.zip
