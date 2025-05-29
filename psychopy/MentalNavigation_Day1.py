@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2024.2.4),
-    on Thu May 29 00:51:52 2025
+    on Thu May 29 18:07:22 2025
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -216,7 +216,10 @@ def setupWindow(expInfo=None, win=None):
         win.backgroundFit = 'none'
         win.units = 'deg'
     if expInfo is not None:
-        expInfo['frameRate'] = 60
+        # get/measure frame rate if not already in expInfo
+        if win._monitorFrameRate is None:
+            win._monitorFrameRate = win.getActualFrameRate(infoMsg='Attempting to measure frame rate of screen, please wait...')
+        expInfo['frameRate'] = win._monitorFrameRate
     win.hideMessage()
     # show a visual indicator if we're in piloting mode
     if PILOTING and prefs.piloting['showPilotingIndicator']:
@@ -541,13 +544,15 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     
     # --- Initialize components for Routine "breakRoutine" ---
     breakText = visual.TextStim(win=win, name='breakText',
-        text='This is the end of first part of the experiment.\n\nTake a break and press space key whenever you are ready for the next part of the experiment.\n\n',
+        text="This concludes this part of the experiment.\n\nPlease take a short break and press the space key when you're ready to proceed to the next part",
         font='Arial',
         units='deg', pos=(0,0), draggable=False, height=1.0, wrapWidth=None, ori=0.0, 
         color=[1.0000, 1.0000, 1.0000], colorSpace='rgb', opacity=25.0, 
         languageStyle='LTR',
         depth=0.0);
     key_resp_2 = keyboard.Keyboard(deviceName='key_resp_2')
+    
+    # --- Initialize components for Routine "blockSetup" ---
     
     # --- Initialize components for Routine "setup" ---
     fixationRed = visual.ShapeStim(
@@ -803,7 +808,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     # each block within a block mode  has different speed and visual mode
     speedOptions = [1,1.5,1.5,1.5,1,1]
     #speedOptions = [0.5,0.66,1,1.25,1.5,2]
-    visualModeOptions = [True,True,False,True,True,False]
+    visualModeOptions = [False,True,False,True,True,False]
     # store start times for expSetup
     expSetup.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
     expSetup.tStart = globalClock.getTime(format='float')
@@ -892,6 +897,38 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     _key_resp_allKeys = []
     # Run 'Begin Routine' code from startClock
     expClock = core.Clock()
+    
+    landmarks = []
+    dotsArray = []
+    
+    dots.depth = 0.5
+    
+    for i in range(numLandmarks):
+        # Create image
+        lm = visual.ImageStim(
+            win=win,
+            name=str(i), units='deg', 
+            image=f'public/landmarks/images/imageset1/{i}.jpg', mask=None, anchor='center',
+            ori=0.0, pos=[0, 0], draggable=False, size=(landmarkWidth, landmarkHeight),
+            color=[1,1,1], colorSpace='rgb', opacity=1,
+            flipHoriz=False, flipVert=False,
+            texRes=128.0, interpolate=True, depth=0.0  # higher depth: behind
+        )
+        lm.idx = i
+        # Create and position dot in front
+        dot = visual.Circle(
+            win=win,
+            radius=0.1,
+            fillColor='red',
+            lineColor='red',
+            units='deg',
+            pos=lm.pos,
+            opacity=lm.opacity,
+            depth=-1.0  # lower depth: in front of image
+        )
+        
+        landmarks.append(lm)
+        dotsArray.append(dot)
     # store start times for eyeSetup
     eyeSetup.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
     eyeSetup.tStart = globalClock.getTime(format='float')
@@ -1024,7 +1061,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     blockTrials = data.TrialHandler2(
         name='blockTrials',
         nReps=len(speedOptions), 
-        method='random', 
+        method='sequential', 
         extraInfo=expInfo, 
         originPath=-1, 
         trialList=[None], 
@@ -1036,16 +1073,10 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     if thisBlockTrial != None:
         for paramName in thisBlockTrial:
             globals()[paramName] = thisBlockTrial[paramName]
-    if thisSession is not None:
-        # if running in a Session with a Liaison client, send data up to now
-        thisSession.sendExperimentData()
     
     for thisBlockTrial in blockTrials:
         currentLoop = blockTrials
         thisExp.timestampOnFlip(win, 'thisRow.t', format=globalClock.format)
-        if thisSession is not None:
-            # if running in a Session with a Liaison client, send data up to now
-            thisSession.sendExperimentData()
         # abbreviate parameter names if possible (e.g. rgb = thisBlockTrial.rgb)
         if thisBlockTrial != None:
             for paramName in thisBlockTrial:
@@ -1181,52 +1212,34 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             # Run 'Begin Routine' code from initializationCode
             dots.speed = 0
             dots.dotLife = -1
-            
+            turn = 1
             random.seed(None)
              
             startId = allPairs[currentTrialDD][0]
             targetId = allPairs[currentTrialDD][1]
             
             targetReached = False
-            landmarks = []
-            dotsArray = []
             
-            for i in range(numLandmarks):
-                # Create image
-                lm = visual.ImageStim(
-                    win=win,
-                    name=str(i), units='deg', 
-                    image=f'public/landmarks/images/imageset1/{i}.jpg', mask=None, anchor='center',
-                    ori=0.0, pos=[0, 0], draggable=False, size=(landmarkWidth, landmarkHeight),
-                    color=[1,1,1], colorSpace='rgb', opacity=None,
-                    flipHoriz=False, flipVert=False,
-                    texRes=128.0, interpolate=True, depth=0.0  # higher depth: behind
-                )
-            
+            for  lm in  landmarks:
                 # Position it
-                lm.pos = ((i - startId) * (landmarkWidth + interLandmarkDistance), startLandmarkY)
-                lm.idx = i
-                if not visualMode and i not in [startId-1, startId, startId+1]:
-                    lm.opacity = 0
-            
-                # Create and position dot in front
-                dot = visual.Circle(
-                    win=win,
-                    radius=0.1,
-                    fillColor='red',
-                    lineColor='red',
-                    units='deg',
-                    pos=lm.pos,
-                    opacity=lm.opacity,
-                    depth=-1.0  # lower depth: in front of image
-                )
-            
-                # Draw order: dot AFTER image, but dot has lower depth = in front
+                lm.pos = ((lm.idx - startId) * (landmarkWidth + interLandmarkDistance), startLandmarkY)
+                dotsArray[lm.idx].pos = lm.pos
+                
+                if not visualMode:
+                    if lm.idx not in [startId-1, startId, startId+1]:
+                        lm.opacity = 0
+                         
+                    else:
+                        lm.opacity = 1
+                else:
+                    lm.opacity = 1
+                    
+                dotsArray[lm.idx].opacity = lm.opacity
+                
+                dotsArray[lm.idx].setAutoDraw(True)
                 lm.setAutoDraw(True)
-                dot.setAutoDraw(True)
-            
-                landmarks.append(lm)
-                dotsArray.append(dot)
+                
+            currentTrialDD+=1 
             # store start times for setup
             setup.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
             setup.tStart = globalClock.getTime(format='float')
@@ -1352,10 +1365,16 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             if thisResponseBlock != None:
                 for paramName in thisResponseBlock:
                     globals()[paramName] = thisResponseBlock[paramName]
+            if thisSession is not None:
+                # if running in a Session with a Liaison client, send data up to now
+                thisSession.sendExperimentData()
             
             for thisResponseBlock in responseBlock:
                 currentLoop = responseBlock
                 thisExp.timestampOnFlip(win, 'thisRow.t', format=globalClock.format)
+                if thisSession is not None:
+                    # if running in a Session with a Liaison client, send data up to now
+                    thisSession.sendExperimentData()
                 # abbreviate parameter names if possible (e.g. rgb = thisResponseBlock.rgb)
                 if thisResponseBlock != None:
                     for paramName in thisResponseBlock:
@@ -1385,29 +1404,24 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                 dots.speed = 0
                 dots.dotLife = -1
                 closestLMs = sorted(landmarks,key=lambda x:abs(x.pos[0]),reverse=False)
+                
                 if visualMode:
                     for index,lm  in  enumerate(closestLMs):
                         lm.opacity = 1  
-                        dotsArray[lm.idx].opacity = 1
                 else:
                     closestLMs[0].opacity = 1
-                    dotsArray[closestLMs[0].idx].opacity = 1
                     closestIdx = closestLMs[0].idx
                     leftLM = landmarks[closestIdx-1] if closestIdx>0 else landmarks[closestIdx]
                     leftLM.opacity = 1
-                    dotsArray[leftLM.idx].opacity = 1
                     rightLM = landmarks[closestIdx+1] if closestIdx<6 else landmarks[closestIdx]
                     rightLM.opacity = 1
-                    dotsArray[rightLM.idx].opacity = 1
-                
+                    
                     
                 targetLandmark.opacity = 1
                         
                 targetLandmark.image = f'public/landmarks/images/imageset1/{targetId}.jpg'
                 
-                win.flip()
-                
-                
+                    
                 if targetReached:
                     score += 1
                     continueRoutine = False
@@ -1563,21 +1577,18 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                             # a response ends the routine
                             continueRoutine = False
                     # Run 'Each Frame' code from move_images
-                    ## add logic to  move the image for each frame   
+                    ## add logic to  move the image for each frame    
                     if loopName == "blockTrials":
                         completedTrials  = blockTrials.thisN
                     elif loopName == "blockTrials_2":
                         completedTrials = blockTrials_2.thisN
                     
                     if devMode:    
-                        statusText = f"Current Time : {str(int(expClock.getTime()))} \n Completed Trials:{completedTrials}/{currentTrialDD} \n Score: {score} \n Speed: {speed} \n Step Size : {dt}" 
+                        statusText = f"Current Time : {str(int(expClock.getTime()))} \n Completed Trials:{completedTrials}/{currentTrialDD} \n Score: {score} \n Speed: {speed} \n Step Size : {dt} \n Visual : {visualMode} " 
                     else:
                         statusText = ''
                         
                     timeText.setText(statusText)
-                    
-                    if stopKey.keys == 's':
-                        experimentExpired = True
                         
                     if  keyRelease.keys == 'left' or keyRelease.keys == 'right':
                         targetReached = abs(landmarks[targetId].pos[0])   <= tolerance * landmarkWidth
@@ -1621,9 +1632,13 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                             dots.speed =  speed*dt
                             dots.dotLife = dotLife
                     
+                    
+                    
+                    for lm in landmarks:
+                        dotsArray[lm.idx].opacity = lm.opacity
+                    
+                    
                      
-                    
-                    
                     
                     # *timeText* updates
                     
@@ -1728,6 +1743,8 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     responseBlock.addData('keyRelease.duration', keyRelease.duration)
                 # Run 'End Routine' code from move_images
                 ## check if start and target is same
+                
+                
                 # check responses
                 if stopKey.keys in ['', [], None]:  # No response was made
                     stopKey.keys = None
@@ -1737,8 +1754,13 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     responseBlock.addData('stopKey.duration', stopKey.duration)
                 # the Routine "trial" was not non-slip safe, so reset the non-slip timer
                 routineTimer.reset()
+                thisExp.nextEntry()
+                
             # completed 2.0 repeats of 'responseBlock'
             
+            if thisSession is not None:
+                # if running in a Session with a Liaison client, send data up to now
+                thisSession.sendExperimentData()
             
             # --- Prepare to start Routine "reset" ---
             # create an object to store info about Routine reset
@@ -1755,13 +1777,14 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             for index,lm in enumerate(landmarks):
                 lm.opacity = 0
                 dotsArray[index].opacity = 0
-            #    del lm
-            #    del dotsArray[index]
-            
-            
             
             eyeRecord = False
             
+            if stopKey.keys == 's':
+                print("Stopping experiment sending bye signal.")
+                continueRoutine = False
+                experimentExpired = True
+                
             if expClock.getTime()>=totalTime:
                 print("Time limit reached. Ending experiment")
                 continueRoutine = False
@@ -1843,17 +1866,17 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             reset.tStopRefresh = tThisFlipGlobal
             thisExp.addData('reset.stopped', reset.tStop)
             # Run 'End Routine' code from resetCode
+            
             if 'experimentExpired' in globals() and experimentExpired:
                 print("Received experiment expired signal. Bye")
             
                 # Try to end the outer loop, whatever it's named
                 if loopName == "blockTrials":
                     blockTrials.finished = True
-                elif loopName == "blockTrials_2":
-                    blockTrials_2.finished = True
-            
-            
-            currentTrialDD+=1
+                elif loopName == "breakLoop":
+                    trials2.finished = True
+                    blockTrials2.finished =True 
+                    breakLoop.finished = True
             
             thisExp.addData('speed',speed)
             thisExp.addData('stepSize',dt)
@@ -1865,11 +1888,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             thisExp.addData('visualMode',visualMode)
             thisExp.addData('devMode',devMode)
             thisExp.addData(f'{loopName}_duration',expClock.getTime())
-            
-            
-            del landmarks
-            del dotsArray
-            
+            thisExp.addData('turn',turn)
             # the Routine "reset" was not non-slip safe, so reset the non-slip timer
             routineTimer.reset()
             thisExp.nextEntry()
@@ -1879,260 +1898,63 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         if thisSession is not None:
             # if running in a Session with a Liaison client, send data up to now
             thisSession.sendExperimentData()
-        thisExp.nextEntry()
-        
     # completed len(speedOptions) repeats of 'blockTrials'
     
-    if thisSession is not None:
-        # if running in a Session with a Liaison client, send data up to now
-        thisSession.sendExperimentData()
-    
-    # --- Prepare to start Routine "breakRoutine" ---
-    # create an object to store info about Routine breakRoutine
-    breakRoutine = data.Routine(
-        name='breakRoutine',
-        components=[breakText, key_resp_2],
-    )
-    breakRoutine.status = NOT_STARTED
-    continueRoutine = True
-    # update component parameters for each repeat
-    # Run 'Begin Routine' code from blockSetup_3
-    visualMode =True
-    loopName =  "blockTrials_2"
-    
-    random.seed(42)
-    trainingSpeeds = [s for _ in range(100) for s in testingStepSizes]
-    random.shuffle(trainingSpeeds)
-    # create starting attributes for key_resp_2
-    key_resp_2.keys = []
-    key_resp_2.rt = []
-    _key_resp_2_allKeys = []
-    # store start times for breakRoutine
-    breakRoutine.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
-    breakRoutine.tStart = globalClock.getTime(format='float')
-    breakRoutine.status = STARTED
-    thisExp.addData('breakRoutine.started', breakRoutine.tStart)
-    breakRoutine.maxDuration = None
-    # keep track of which components have finished
-    breakRoutineComponents = breakRoutine.components
-    for thisComponent in breakRoutine.components:
-        thisComponent.tStart = None
-        thisComponent.tStop = None
-        thisComponent.tStartRefresh = None
-        thisComponent.tStopRefresh = None
-        if hasattr(thisComponent, 'status'):
-            thisComponent.status = NOT_STARTED
-    # reset timers
-    t = 0
-    _timeToFirstFrame = win.getFutureFlipTime(clock="now")
-    frameN = -1
-    
-    # --- Run Routine "breakRoutine" ---
-    breakRoutine.forceEnded = routineForceEnded = not continueRoutine
-    while continueRoutine:
-        # get current time
-        t = routineTimer.getTime()
-        tThisFlip = win.getFutureFlipTime(clock=routineTimer)
-        tThisFlipGlobal = win.getFutureFlipTime(clock=None)
-        frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
-        # update/draw components on each frame
-        
-        # *breakText* updates
-        
-        # if breakText is starting this frame...
-        if breakText.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
-            # keep track of start time/frame for later
-            breakText.frameNStart = frameN  # exact frame index
-            breakText.tStart = t  # local t and not account for scr refresh
-            breakText.tStartRefresh = tThisFlipGlobal  # on global time
-            win.timeOnFlip(breakText, 'tStartRefresh')  # time at next scr refresh
-            # add timestamp to datafile
-            thisExp.timestampOnFlip(win, 'breakText.started')
-            # update status
-            breakText.status = STARTED
-            breakText.setAutoDraw(True)
-        
-        # if breakText is active this frame...
-        if breakText.status == STARTED:
-            # update params
-            pass
-        
-        # *key_resp_2* updates
-        waitOnFlip = False
-        
-        # if key_resp_2 is starting this frame...
-        if key_resp_2.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
-            # keep track of start time/frame for later
-            key_resp_2.frameNStart = frameN  # exact frame index
-            key_resp_2.tStart = t  # local t and not account for scr refresh
-            key_resp_2.tStartRefresh = tThisFlipGlobal  # on global time
-            win.timeOnFlip(key_resp_2, 'tStartRefresh')  # time at next scr refresh
-            # add timestamp to datafile
-            thisExp.timestampOnFlip(win, 'key_resp_2.started')
-            # update status
-            key_resp_2.status = STARTED
-            # keyboard checking is just starting
-            waitOnFlip = True
-            win.callOnFlip(key_resp_2.clock.reset)  # t=0 on next screen flip
-            win.callOnFlip(key_resp_2.clearEvents, eventType='keyboard')  # clear events on next screen flip
-        if key_resp_2.status == STARTED and not waitOnFlip:
-            theseKeys = key_resp_2.getKeys(keyList=['space'], ignoreKeys=["escape"], waitRelease=False)
-            _key_resp_2_allKeys.extend(theseKeys)
-            if len(_key_resp_2_allKeys):
-                key_resp_2.keys = _key_resp_2_allKeys[-1].name  # just the last key pressed
-                key_resp_2.rt = _key_resp_2_allKeys[-1].rt
-                key_resp_2.duration = _key_resp_2_allKeys[-1].duration
-                # a response ends the routine
-                continueRoutine = False
-        
-        # check for quit (typically the Esc key)
-        if defaultKeyboard.getKeys(keyList=["escape"]):
-            thisExp.status = FINISHED
-        if thisExp.status == FINISHED or endExpNow:
-            endExperiment(thisExp, win=win)
-            return
-        # pause experiment here if requested
-        if thisExp.status == PAUSED:
-            pauseExperiment(
-                thisExp=thisExp, 
-                win=win, 
-                timers=[routineTimer], 
-                playbackComponents=[]
-            )
-            # skip the frame we paused on
-            continue
-        
-        # check if all components have finished
-        if not continueRoutine:  # a component has requested a forced-end of Routine
-            breakRoutine.forceEnded = routineForceEnded = True
-            break
-        continueRoutine = False  # will revert to True if at least one component still running
-        for thisComponent in breakRoutine.components:
-            if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
-                continueRoutine = True
-                break  # at least one component has not yet finished
-        
-        # refresh the screen
-        if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
-            win.flip()
-    
-    # --- Ending Routine "breakRoutine" ---
-    for thisComponent in breakRoutine.components:
-        if hasattr(thisComponent, "setAutoDraw"):
-            thisComponent.setAutoDraw(False)
-    # store stop times for breakRoutine
-    breakRoutine.tStop = globalClock.getTime(format='float')
-    breakRoutine.tStopRefresh = tThisFlipGlobal
-    thisExp.addData('breakRoutine.stopped', breakRoutine.tStop)
-    # check responses
-    if key_resp_2.keys in ['', [], None]:  # No response was made
-        key_resp_2.keys = None
-    thisExp.addData('key_resp_2.keys',key_resp_2.keys)
-    if key_resp_2.keys != None:  # we had a response
-        thisExp.addData('key_resp_2.rt', key_resp_2.rt)
-        thisExp.addData('key_resp_2.duration', key_resp_2.duration)
-    thisExp.nextEntry()
-    # the Routine "breakRoutine" was not non-slip safe, so reset the non-slip timer
-    routineTimer.reset()
     
     # set up handler to look after randomisation of conditions etc
-    blockTrials_2 = data.TrialHandler2(
-        name='blockTrials_2',
-        nReps=0.0, 
+    breakLoop = data.TrialHandler2(
+        name='breakLoop',
+        nReps=6.0, 
         method='random', 
         extraInfo=expInfo, 
         originPath=-1, 
         trialList=[None], 
         seed=None, 
     )
-    thisExp.addLoop(blockTrials_2)  # add the loop to the experiment
-    thisBlockTrial_2 = blockTrials_2.trialList[0]  # so we can initialise stimuli with some values
-    # abbreviate parameter names if possible (e.g. rgb = thisBlockTrial_2.rgb)
-    if thisBlockTrial_2 != None:
-        for paramName in thisBlockTrial_2:
-            globals()[paramName] = thisBlockTrial_2[paramName]
-    if thisSession is not None:
-        # if running in a Session with a Liaison client, send data up to now
-        thisSession.sendExperimentData()
+    thisExp.addLoop(breakLoop)  # add the loop to the experiment
+    thisBreakLoop = breakLoop.trialList[0]  # so we can initialise stimuli with some values
+    # abbreviate parameter names if possible (e.g. rgb = thisBreakLoop.rgb)
+    if thisBreakLoop != None:
+        for paramName in thisBreakLoop:
+            globals()[paramName] = thisBreakLoop[paramName]
     
-    for thisBlockTrial_2 in blockTrials_2:
-        currentLoop = blockTrials_2
+    for thisBreakLoop in breakLoop:
+        currentLoop = breakLoop
         thisExp.timestampOnFlip(win, 'thisRow.t', format=globalClock.format)
-        if thisSession is not None:
-            # if running in a Session with a Liaison client, send data up to now
-            thisSession.sendExperimentData()
-        # abbreviate parameter names if possible (e.g. rgb = thisBlockTrial_2.rgb)
-        if thisBlockTrial_2 != None:
-            for paramName in thisBlockTrial_2:
-                globals()[paramName] = thisBlockTrial_2[paramName]
+        # abbreviate parameter names if possible (e.g. rgb = thisBreakLoop.rgb)
+        if thisBreakLoop != None:
+            for paramName in thisBreakLoop:
+                globals()[paramName] = thisBreakLoop[paramName]
         
-        # --- Prepare to start Routine "setup" ---
-        # create an object to store info about Routine setup
-        setup = data.Routine(
-            name='setup',
-            components=[fixationRed],
+        # --- Prepare to start Routine "breakRoutine" ---
+        # create an object to store info about Routine breakRoutine
+        breakRoutine = data.Routine(
+            name='breakRoutine',
+            components=[breakText, key_resp_2],
         )
-        setup.status = NOT_STARTED
+        breakRoutine.status = NOT_STARTED
         continueRoutine = True
         # update component parameters for each repeat
-        # Run 'Begin Routine' code from initializationCode
-        dots.speed = 0
-        dots.dotLife = -1
+        # Run 'Begin Routine' code from blockSetup_3
+        visualMode =True
+        loopName =  "breakLoop"
         
-        random.seed(None)
-         
-        startId = allPairs[currentTrialDD][0]
-        targetId = allPairs[currentTrialDD][1]
-        
-        targetReached = False
-        landmarks = []
-        dotsArray = []
-        
-        for i in range(numLandmarks):
-            # Create image
-            lm = visual.ImageStim(
-                win=win,
-                name=str(i), units='deg', 
-                image=f'public/landmarks/images/imageset1/{i}.jpg', mask=None, anchor='center',
-                ori=0.0, pos=[0, 0], draggable=False, size=(landmarkWidth, landmarkHeight),
-                color=[1,1,1], colorSpace='rgb', opacity=None,
-                flipHoriz=False, flipVert=False,
-                texRes=128.0, interpolate=True, depth=0.0  # higher depth: behind
-            )
-        
-            # Position it
-            lm.pos = ((i - startId) * (landmarkWidth + interLandmarkDistance), startLandmarkY)
-            lm.idx = i
-            if not visualMode and i not in [startId-1, startId, startId+1]:
-                lm.opacity = 0
-        
-            # Create and position dot in front
-            dot = visual.Circle(
-                win=win,
-                radius=0.1,
-                fillColor='red',
-                lineColor='red',
-                units='deg',
-                pos=lm.pos,
-                opacity=lm.opacity,
-                depth=-1.0  # lower depth: in front of image
-            )
-        
-            # Draw order: dot AFTER image, but dot has lower depth = in front
-            lm.setAutoDraw(True)
-            dot.setAutoDraw(True)
-        
-            landmarks.append(lm)
-            dotsArray.append(dot)
-        # store start times for setup
-        setup.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
-        setup.tStart = globalClock.getTime(format='float')
-        setup.status = STARTED
-        thisExp.addData('setup.started', setup.tStart)
-        setup.maxDuration = None
+        random.seed(42)
+        trainingSpeeds = [s for _ in range(10) for s in testingStepSizes]
+        random.shuffle(trainingSpeeds)
+        # create starting attributes for key_resp_2
+        key_resp_2.keys = []
+        key_resp_2.rt = []
+        _key_resp_2_allKeys = []
+        # store start times for breakRoutine
+        breakRoutine.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
+        breakRoutine.tStart = globalClock.getTime(format='float')
+        breakRoutine.status = STARTED
+        thisExp.addData('breakRoutine.started', breakRoutine.tStart)
+        breakRoutine.maxDuration = None
         # keep track of which components have finished
-        setupComponents = setup.components
-        for thisComponent in setup.components:
+        breakRoutineComponents = breakRoutine.components
+        for thisComponent in breakRoutine.components:
             thisComponent.tStart = None
             thisComponent.tStop = None
             thisComponent.tStartRefresh = None
@@ -2144,11 +1966,11 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         _timeToFirstFrame = win.getFutureFlipTime(clock="now")
         frameN = -1
         
-        # --- Run Routine "setup" ---
+        # --- Run Routine "breakRoutine" ---
         # if trial has changed, end Routine now
-        if isinstance(blockTrials_2, data.TrialHandler2) and thisBlockTrial_2.thisN != blockTrials_2.thisTrial.thisN:
+        if isinstance(breakLoop, data.TrialHandler2) and thisBreakLoop.thisN != breakLoop.thisTrial.thisN:
             continueRoutine = False
-        setup.forceEnded = routineForceEnded = not continueRoutine
+        breakRoutine.forceEnded = routineForceEnded = not continueRoutine
         while continueRoutine:
             # get current time
             t = routineTimer.getTime()
@@ -2157,39 +1979,53 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
             # update/draw components on each frame
             
-            # *fixationRed* updates
+            # *breakText* updates
             
-            # if fixationRed is starting this frame...
-            if fixationRed.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+            # if breakText is starting this frame...
+            if breakText.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
                 # keep track of start time/frame for later
-                fixationRed.frameNStart = frameN  # exact frame index
-                fixationRed.tStart = t  # local t and not account for scr refresh
-                fixationRed.tStartRefresh = tThisFlipGlobal  # on global time
-                win.timeOnFlip(fixationRed, 'tStartRefresh')  # time at next scr refresh
+                breakText.frameNStart = frameN  # exact frame index
+                breakText.tStart = t  # local t and not account for scr refresh
+                breakText.tStartRefresh = tThisFlipGlobal  # on global time
+                win.timeOnFlip(breakText, 'tStartRefresh')  # time at next scr refresh
                 # add timestamp to datafile
-                thisExp.timestampOnFlip(win, 'fixationRed.started')
+                thisExp.timestampOnFlip(win, 'breakText.started')
                 # update status
-                fixationRed.status = STARTED
-                fixationRed.setAutoDraw(True)
+                breakText.status = STARTED
+                breakText.setAutoDraw(True)
             
-            # if fixationRed is active this frame...
-            if fixationRed.status == STARTED:
+            # if breakText is active this frame...
+            if breakText.status == STARTED:
                 # update params
                 pass
             
-            # if fixationRed is stopping this frame...
-            if fixationRed.status == STARTED:
-                # is it time to stop? (based on global clock, using actual start)
-                if tThisFlipGlobal > fixationRed.tStartRefresh + random.uniform(0,0.5)-frameTolerance:
-                    # keep track of stop time/frame for later
-                    fixationRed.tStop = t  # not accounting for scr refresh
-                    fixationRed.tStopRefresh = tThisFlipGlobal  # on global time
-                    fixationRed.frameNStop = frameN  # exact frame index
-                    # add timestamp to datafile
-                    thisExp.timestampOnFlip(win, 'fixationRed.stopped')
-                    # update status
-                    fixationRed.status = FINISHED
-                    fixationRed.setAutoDraw(False)
+            # *key_resp_2* updates
+            waitOnFlip = False
+            
+            # if key_resp_2 is starting this frame...
+            if key_resp_2.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+                # keep track of start time/frame for later
+                key_resp_2.frameNStart = frameN  # exact frame index
+                key_resp_2.tStart = t  # local t and not account for scr refresh
+                key_resp_2.tStartRefresh = tThisFlipGlobal  # on global time
+                win.timeOnFlip(key_resp_2, 'tStartRefresh')  # time at next scr refresh
+                # add timestamp to datafile
+                thisExp.timestampOnFlip(win, 'key_resp_2.started')
+                # update status
+                key_resp_2.status = STARTED
+                # keyboard checking is just starting
+                waitOnFlip = True
+                win.callOnFlip(key_resp_2.clock.reset)  # t=0 on next screen flip
+                win.callOnFlip(key_resp_2.clearEvents, eventType='keyboard')  # clear events on next screen flip
+            if key_resp_2.status == STARTED and not waitOnFlip:
+                theseKeys = key_resp_2.getKeys(keyList=['space'], ignoreKeys=["escape"], waitRelease=False)
+                _key_resp_2_allKeys.extend(theseKeys)
+                if len(_key_resp_2_allKeys):
+                    key_resp_2.keys = _key_resp_2_allKeys[-1].name  # just the last key pressed
+                    key_resp_2.rt = _key_resp_2_allKeys[-1].rt
+                    key_resp_2.duration = _key_resp_2_allKeys[-1].duration
+                    # a response ends the routine
+                    continueRoutine = False
             
             # check for quit (typically the Esc key)
             if defaultKeyboard.getKeys(keyList=["escape"]):
@@ -2210,10 +2046,10 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             
             # check if all components have finished
             if not continueRoutine:  # a component has requested a forced-end of Routine
-                setup.forceEnded = routineForceEnded = True
+                breakRoutine.forceEnded = routineForceEnded = True
                 break
             continueRoutine = False  # will revert to True if at least one component still running
-            for thisComponent in setup.components:
+            for thisComponent in breakRoutine.components:
                 if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
                     continueRoutine = True
                     break  # at least one component has not yet finished
@@ -2222,106 +2058,76 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
                 win.flip()
         
-        # --- Ending Routine "setup" ---
-        for thisComponent in setup.components:
+        # --- Ending Routine "breakRoutine" ---
+        for thisComponent in breakRoutine.components:
             if hasattr(thisComponent, "setAutoDraw"):
                 thisComponent.setAutoDraw(False)
-        # store stop times for setup
-        setup.tStop = globalClock.getTime(format='float')
-        setup.tStopRefresh = tThisFlipGlobal
-        thisExp.addData('setup.stopped', setup.tStop)
-        # the Routine "setup" was not non-slip safe, so reset the non-slip timer
+        # store stop times for breakRoutine
+        breakRoutine.tStop = globalClock.getTime(format='float')
+        breakRoutine.tStopRefresh = tThisFlipGlobal
+        thisExp.addData('breakRoutine.stopped', breakRoutine.tStop)
+        # check responses
+        if key_resp_2.keys in ['', [], None]:  # No response was made
+            key_resp_2.keys = None
+        breakLoop.addData('key_resp_2.keys',key_resp_2.keys)
+        if key_resp_2.keys != None:  # we had a response
+            breakLoop.addData('key_resp_2.rt', key_resp_2.rt)
+            breakLoop.addData('key_resp_2.duration', key_resp_2.duration)
+        # the Routine "breakRoutine" was not non-slip safe, so reset the non-slip timer
         routineTimer.reset()
         
         # set up handler to look after randomisation of conditions etc
-        responseBlock_2 = data.TrialHandler2(
-            name='responseBlock_2',
-            nReps=2.0, 
+        blockTrials2 = data.TrialHandler2(
+            name='blockTrials2',
+            nReps=5.0, 
             method='random', 
             extraInfo=expInfo, 
             originPath=-1, 
             trialList=[None], 
             seed=None, 
         )
-        thisExp.addLoop(responseBlock_2)  # add the loop to the experiment
-        thisResponseBlock_2 = responseBlock_2.trialList[0]  # so we can initialise stimuli with some values
-        # abbreviate parameter names if possible (e.g. rgb = thisResponseBlock_2.rgb)
-        if thisResponseBlock_2 != None:
-            for paramName in thisResponseBlock_2:
-                globals()[paramName] = thisResponseBlock_2[paramName]
+        thisExp.addLoop(blockTrials2)  # add the loop to the experiment
+        thisBlockTrials2 = blockTrials2.trialList[0]  # so we can initialise stimuli with some values
+        # abbreviate parameter names if possible (e.g. rgb = thisBlockTrials2.rgb)
+        if thisBlockTrials2 != None:
+            for paramName in thisBlockTrials2:
+                globals()[paramName] = thisBlockTrials2[paramName]
+        if thisSession is not None:
+            # if running in a Session with a Liaison client, send data up to now
+            thisSession.sendExperimentData()
         
-        for thisResponseBlock_2 in responseBlock_2:
-            currentLoop = responseBlock_2
+        for thisBlockTrials2 in blockTrials2:
+            currentLoop = blockTrials2
             thisExp.timestampOnFlip(win, 'thisRow.t', format=globalClock.format)
-            # abbreviate parameter names if possible (e.g. rgb = thisResponseBlock_2.rgb)
-            if thisResponseBlock_2 != None:
-                for paramName in thisResponseBlock_2:
-                    globals()[paramName] = thisResponseBlock_2[paramName]
+            if thisSession is not None:
+                # if running in a Session with a Liaison client, send data up to now
+                thisSession.sendExperimentData()
+            # abbreviate parameter names if possible (e.g. rgb = thisBlockTrials2.rgb)
+            if thisBlockTrials2 != None:
+                for paramName in thisBlockTrials2:
+                    globals()[paramName] = thisBlockTrials2[paramName]
             
-            # --- Prepare to start Routine "trial" ---
-            # create an object to store info about Routine trial
-            trial = data.Routine(
-                name='trial',
-                components=[dots, targetLandmark, fixationRedTrial, keyPress, keyRelease, timeText, stopKey],
+            # --- Prepare to start Routine "blockSetup" ---
+            # create an object to store info about Routine blockSetup
+            blockSetup = data.Routine(
+                name='blockSetup',
+                components=[],
             )
-            trial.status = NOT_STARTED
+            blockSetup.status = NOT_STARTED
             continueRoutine = True
             # update component parameters for each repeat
-            dots.refreshDots()
-            targetLandmark.setImage('public/landmarks/images/imageset1/1.jpg')
-            # create starting attributes for keyPress
-            keyPress.keys = []
-            keyPress.rt = []
-            _keyPress_allKeys = []
-            # create starting attributes for keyRelease
-            keyRelease.keys = []
-            keyRelease.rt = []
-            _keyRelease_allKeys = []
-            # Run 'Begin Routine' code from move_images
-            ## add logic to  add all images on a line
-            dots.speed = 0
-            dots.dotLife = -1
-            closestLMs = sorted(landmarks,key=lambda x:abs(x.pos[0]),reverse=False)
-            if visualMode:
-                for index,lm  in  enumerate(closestLMs):
-                    lm.opacity = 1  
-                    dotsArray[lm.idx].opacity = 1
-            else:
-                closestLMs[0].opacity = 1
-                dotsArray[closestLMs[0].idx].opacity = 1
-                closestIdx = closestLMs[0].idx
-                leftLM = landmarks[closestIdx-1] if closestIdx>0 else landmarks[closestIdx]
-                leftLM.opacity = 1
-                dotsArray[leftLM.idx].opacity = 1
-                rightLM = landmarks[closestIdx+1] if closestIdx<6 else landmarks[closestIdx]
-                rightLM.opacity = 1
-                dotsArray[rightLM.idx].opacity = 1
-            
-                
-            targetLandmark.opacity = 1
-                    
-            targetLandmark.image = f'public/landmarks/images/imageset1/{targetId}.jpg'
-            
-            win.flip()
-            
-            
-            if targetReached:
-                score += 1
-                continueRoutine = False
-                
-            # create starting attributes for stopKey
-            stopKey.keys = []
-            stopKey.rt = []
-            _stopKey_allKeys = []
-            # store start times for trial
-            trial.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
-            trial.tStart = globalClock.getTime(format='float')
-            trial.status = STARTED
-            thisExp.addData('trial.started', trial.tStart)
-            trial.maxDuration = None
+            # Run 'Begin Routine' code from blockSetup_2
+            visualMode= visualModeOptions[blockTrials.thisN]
+            speed = speedOptions[blockTrials.thisN]
+            # store start times for blockSetup
+            blockSetup.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
+            blockSetup.tStart = globalClock.getTime(format='float')
+            blockSetup.status = STARTED
+            thisExp.addData('blockSetup.started', blockSetup.tStart)
+            blockSetup.maxDuration = None
             # keep track of which components have finished
-            trialComponents = trial.components
-            for thisComponent in trial.components:
+            blockSetupComponents = blockSetup.components
+            for thisComponent in blockSetup.components:
                 thisComponent.tStart = None
                 thisComponent.tStop = None
                 thisComponent.tStartRefresh = None
@@ -2333,11 +2139,11 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             _timeToFirstFrame = win.getFutureFlipTime(clock="now")
             frameN = -1
             
-            # --- Run Routine "trial" ---
+            # --- Run Routine "blockSetup" ---
             # if trial has changed, end Routine now
-            if isinstance(responseBlock_2, data.TrialHandler2) and thisResponseBlock_2.thisN != responseBlock_2.thisTrial.thisN:
+            if isinstance(blockTrials2, data.TrialHandler2) and thisBlockTrials2.thisN != blockTrials2.thisTrial.thisN:
                 continueRoutine = False
-            trial.forceEnded = routineForceEnded = not continueRoutine
+            blockSetup.forceEnded = routineForceEnded = not continueRoutine
             while continueRoutine:
                 # get current time
                 t = routineTimer.getTime()
@@ -2345,230 +2151,6 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                 tThisFlipGlobal = win.getFutureFlipTime(clock=None)
                 frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
                 # update/draw components on each frame
-                
-                # *dots* updates
-                
-                # if dots is starting this frame...
-                if dots.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
-                    # keep track of start time/frame for later
-                    dots.frameNStart = frameN  # exact frame index
-                    dots.tStart = t  # local t and not account for scr refresh
-                    dots.tStartRefresh = tThisFlipGlobal  # on global time
-                    win.timeOnFlip(dots, 'tStartRefresh')  # time at next scr refresh
-                    # add timestamp to datafile
-                    thisExp.timestampOnFlip(win, 'dots.started')
-                    # update status
-                    dots.status = STARTED
-                    dots.setAutoDraw(True)
-                
-                # if dots is active this frame...
-                if dots.status == STARTED:
-                    # update params
-                    pass
-                
-                # *targetLandmark* updates
-                
-                # if targetLandmark is starting this frame...
-                if targetLandmark.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
-                    # keep track of start time/frame for later
-                    targetLandmark.frameNStart = frameN  # exact frame index
-                    targetLandmark.tStart = t  # local t and not account for scr refresh
-                    targetLandmark.tStartRefresh = tThisFlipGlobal  # on global time
-                    win.timeOnFlip(targetLandmark, 'tStartRefresh')  # time at next scr refresh
-                    # add timestamp to datafile
-                    thisExp.timestampOnFlip(win, 'targetLandmark.started')
-                    # update status
-                    targetLandmark.status = STARTED
-                    targetLandmark.setAutoDraw(True)
-                
-                # if targetLandmark is active this frame...
-                if targetLandmark.status == STARTED:
-                    # update params
-                    pass
-                
-                # *fixationRedTrial* updates
-                
-                # if fixationRedTrial is starting this frame...
-                if fixationRedTrial.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
-                    # keep track of start time/frame for later
-                    fixationRedTrial.frameNStart = frameN  # exact frame index
-                    fixationRedTrial.tStart = t  # local t and not account for scr refresh
-                    fixationRedTrial.tStartRefresh = tThisFlipGlobal  # on global time
-                    win.timeOnFlip(fixationRedTrial, 'tStartRefresh')  # time at next scr refresh
-                    # add timestamp to datafile
-                    thisExp.timestampOnFlip(win, 'fixationRedTrial.started')
-                    # update status
-                    fixationRedTrial.status = STARTED
-                    fixationRedTrial.setAutoDraw(True)
-                
-                # if fixationRedTrial is active this frame...
-                if fixationRedTrial.status == STARTED:
-                    # update params
-                    pass
-                
-                # *keyPress* updates
-                waitOnFlip = False
-                
-                # if keyPress is starting this frame...
-                if keyPress.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
-                    # keep track of start time/frame for later
-                    keyPress.frameNStart = frameN  # exact frame index
-                    keyPress.tStart = t  # local t and not account for scr refresh
-                    keyPress.tStartRefresh = tThisFlipGlobal  # on global time
-                    win.timeOnFlip(keyPress, 'tStartRefresh')  # time at next scr refresh
-                    # add timestamp to datafile
-                    thisExp.timestampOnFlip(win, 'keyPress.started')
-                    # update status
-                    keyPress.status = STARTED
-                    # keyboard checking is just starting
-                    waitOnFlip = True
-                    win.callOnFlip(keyPress.clock.reset)  # t=0 on next screen flip
-                    win.callOnFlip(keyPress.clearEvents, eventType='keyboard')  # clear events on next screen flip
-                if keyPress.status == STARTED and not waitOnFlip:
-                    theseKeys = keyPress.getKeys(keyList=['left','right'], ignoreKeys=["escape"], waitRelease=False)
-                    _keyPress_allKeys.extend(theseKeys)
-                    if len(_keyPress_allKeys):
-                        keyPress.keys = _keyPress_allKeys[-1].name  # just the last key pressed
-                        keyPress.rt = _keyPress_allKeys[-1].rt
-                        keyPress.duration = _keyPress_allKeys[-1].duration
-                
-                # *keyRelease* updates
-                waitOnFlip = False
-                
-                # if keyRelease is starting this frame...
-                if keyRelease.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
-                    # keep track of start time/frame for later
-                    keyRelease.frameNStart = frameN  # exact frame index
-                    keyRelease.tStart = t  # local t and not account for scr refresh
-                    keyRelease.tStartRefresh = tThisFlipGlobal  # on global time
-                    win.timeOnFlip(keyRelease, 'tStartRefresh')  # time at next scr refresh
-                    # add timestamp to datafile
-                    thisExp.timestampOnFlip(win, 'keyRelease.started')
-                    # update status
-                    keyRelease.status = STARTED
-                    # keyboard checking is just starting
-                    waitOnFlip = True
-                    win.callOnFlip(keyRelease.clock.reset)  # t=0 on next screen flip
-                    win.callOnFlip(keyRelease.clearEvents, eventType='keyboard')  # clear events on next screen flip
-                if keyRelease.status == STARTED and not waitOnFlip:
-                    theseKeys = keyRelease.getKeys(keyList=['left','right'], ignoreKeys=["escape"], waitRelease=True)
-                    _keyRelease_allKeys.extend(theseKeys)
-                    if len(_keyRelease_allKeys):
-                        keyRelease.keys = _keyRelease_allKeys[-1].name  # just the last key pressed
-                        keyRelease.rt = _keyRelease_allKeys[-1].rt
-                        keyRelease.duration = _keyRelease_allKeys[-1].duration
-                        # a response ends the routine
-                        continueRoutine = False
-                # Run 'Each Frame' code from move_images
-                ## add logic to  move the image for each frame   
-                if loopName == "blockTrials":
-                    completedTrials  = blockTrials.thisN
-                elif loopName == "blockTrials_2":
-                    completedTrials = blockTrials_2.thisN
-                
-                if devMode:    
-                    statusText = f"Current Time : {str(int(expClock.getTime()))} \n Completed Trials:{completedTrials}/{currentTrialDD} \n Score: {score} \n Speed: {speed} \n Step Size : {dt}" 
-                else:
-                    statusText = ''
-                    
-                timeText.setText(statusText)
-                
-                if stopKey.keys == 's':
-                    experimentExpired = True
-                    
-                if  keyRelease.keys == 'left' or keyRelease.keys == 'right':
-                    targetReached = abs(landmarks[targetId].pos[0])   <= tolerance * landmarkWidth
-                    dots.dir =  0
-                    dots.dotLife = -1
-                    dots.speed = 0
-                    
-                if keyPress.keys == 'left' or keyPress.keys  == 'right':
-                    if not visualMode:
-                        for lm in  landmarks:
-                            lm.opacity = 0
-                            dotsArray[lm.idx].opacity = 0
-                        targetLandmark.opacity = 0
-                        
-                if  keyPress.keys == 'left':
-                    dots.dir =  180
-                    for lm in landmarks:
-                        if  landmarks[-1].pos[0]<-1*edgeLandmarkDistance:
-                            break
-                        lm.pos -= (speed*dt,0)
-                        dotsArray[lm.idx].pos -= (speed*dt,0)
-                
-                    if  landmarks[-1].pos[0]<-1*edgeLandmarkDistance:
-                        dots.speed = 0
-                        dots.dotLife = -1
-                    else:
-                        dots.speed =  speed*dt
-                        dots.dotLife = dotLife
-                    
-                elif  keyPress.keys == 'right':
-                    dots.dir = 0
-                    for lm in landmarks:
-                        if  landmarks[0].pos[0]>edgeLandmarkDistance:
-                            break
-                        lm.pos += (speed*dt,0)
-                        dotsArray[lm.idx].pos += (speed*dt,0)
-                    if  landmarks[0].pos[0]>edgeLandmarkDistance:
-                        dots.speed = 0
-                        dots.dotLife = -1
-                    else:
-                        dots.speed =  speed*dt
-                        dots.dotLife = dotLife
-                
-                 
-                
-                
-                
-                # *timeText* updates
-                
-                # if timeText is starting this frame...
-                if timeText.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
-                    # keep track of start time/frame for later
-                    timeText.frameNStart = frameN  # exact frame index
-                    timeText.tStart = t  # local t and not account for scr refresh
-                    timeText.tStartRefresh = tThisFlipGlobal  # on global time
-                    win.timeOnFlip(timeText, 'tStartRefresh')  # time at next scr refresh
-                    # add timestamp to datafile
-                    thisExp.timestampOnFlip(win, 'timeText.started')
-                    # update status
-                    timeText.status = STARTED
-                    timeText.setAutoDraw(True)
-                
-                # if timeText is active this frame...
-                if timeText.status == STARTED:
-                    # update params
-                    pass
-                
-                # *stopKey* updates
-                waitOnFlip = False
-                
-                # if stopKey is starting this frame...
-                if stopKey.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
-                    # keep track of start time/frame for later
-                    stopKey.frameNStart = frameN  # exact frame index
-                    stopKey.tStart = t  # local t and not account for scr refresh
-                    stopKey.tStartRefresh = tThisFlipGlobal  # on global time
-                    win.timeOnFlip(stopKey, 'tStartRefresh')  # time at next scr refresh
-                    # add timestamp to datafile
-                    thisExp.timestampOnFlip(win, 'stopKey.started')
-                    # update status
-                    stopKey.status = STARTED
-                    # keyboard checking is just starting
-                    waitOnFlip = True
-                    win.callOnFlip(stopKey.clock.reset)  # t=0 on next screen flip
-                    win.callOnFlip(stopKey.clearEvents, eventType='keyboard')  # clear events on next screen flip
-                if stopKey.status == STARTED and not waitOnFlip:
-                    theseKeys = stopKey.getKeys(keyList=['s'], ignoreKeys=["escape"], waitRelease=False)
-                    _stopKey_allKeys.extend(theseKeys)
-                    if len(_stopKey_allKeys):
-                        stopKey.keys = _stopKey_allKeys[-1].name  # just the last key pressed
-                        stopKey.rt = _stopKey_allKeys[-1].rt
-                        stopKey.duration = _stopKey_allKeys[-1].duration
-                        # a response ends the routine
-                        continueRoutine = False
                 
                 # check for quit (typically the Esc key)
                 if defaultKeyboard.getKeys(keyList=["escape"]):
@@ -2589,10 +2171,10 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                 
                 # check if all components have finished
                 if not continueRoutine:  # a component has requested a forced-end of Routine
-                    trial.forceEnded = routineForceEnded = True
+                    blockSetup.forceEnded = routineForceEnded = True
                     break
                 continueRoutine = False  # will revert to True if at least one component still running
-                for thisComponent in trial.components:
+                for thisComponent in blockSetup.components:
                     if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
                         continueRoutine = True
                         break  # at least one component has not yet finished
@@ -2601,181 +2183,755 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                 if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
                     win.flip()
             
-            # --- Ending Routine "trial" ---
-            for thisComponent in trial.components:
+            # --- Ending Routine "blockSetup" ---
+            for thisComponent in blockSetup.components:
                 if hasattr(thisComponent, "setAutoDraw"):
                     thisComponent.setAutoDraw(False)
-            # store stop times for trial
-            trial.tStop = globalClock.getTime(format='float')
-            trial.tStopRefresh = tThisFlipGlobal
-            thisExp.addData('trial.stopped', trial.tStop)
-            # check responses
-            if keyPress.keys in ['', [], None]:  # No response was made
-                keyPress.keys = None
-            responseBlock_2.addData('keyPress.keys',keyPress.keys)
-            if keyPress.keys != None:  # we had a response
-                responseBlock_2.addData('keyPress.rt', keyPress.rt)
-                responseBlock_2.addData('keyPress.duration', keyPress.duration)
-            # check responses
-            if keyRelease.keys in ['', [], None]:  # No response was made
-                keyRelease.keys = None
-            responseBlock_2.addData('keyRelease.keys',keyRelease.keys)
-            if keyRelease.keys != None:  # we had a response
-                responseBlock_2.addData('keyRelease.rt', keyRelease.rt)
-                responseBlock_2.addData('keyRelease.duration', keyRelease.duration)
-            # Run 'End Routine' code from move_images
-            ## check if start and target is same
-            # check responses
-            if stopKey.keys in ['', [], None]:  # No response was made
-                stopKey.keys = None
-            responseBlock_2.addData('stopKey.keys',stopKey.keys)
-            if stopKey.keys != None:  # we had a response
-                responseBlock_2.addData('stopKey.rt', stopKey.rt)
-                responseBlock_2.addData('stopKey.duration', stopKey.duration)
-            # the Routine "trial" was not non-slip safe, so reset the non-slip timer
+            # store stop times for blockSetup
+            blockSetup.tStop = globalClock.getTime(format='float')
+            blockSetup.tStopRefresh = tThisFlipGlobal
+            thisExp.addData('blockSetup.stopped', blockSetup.tStop)
+            # the Routine "blockSetup" was not non-slip safe, so reset the non-slip timer
             routineTimer.reset()
-        # completed 2.0 repeats of 'responseBlock_2'
-        
-        
-        # --- Prepare to start Routine "reset" ---
-        # create an object to store info about Routine reset
-        reset = data.Routine(
-            name='reset',
-            components=[],
-        )
-        reset.status = NOT_STARTED
-        continueRoutine = True
-        # update component parameters for each repeat
-        # Run 'Begin Routine' code from resetCode
-        #core.wait(0.5)
-        
-        for index,lm in enumerate(landmarks):
-            lm.opacity = 0
-            dotsArray[index].opacity = 0
-        #    del lm
-        #    del dotsArray[index]
-        
-        
-        
-        eyeRecord = False
-        
-        if expClock.getTime()>=totalTime:
-            print("Time limit reached. Ending experiment")
-            continueRoutine = False
-            experimentExpired = True
             
+            # set up handler to look after randomisation of conditions etc
+            trials2 = data.TrialHandler2(
+                name='trials2',
+                nReps=10.0, 
+                method='random', 
+                extraInfo=expInfo, 
+                originPath=-1, 
+                trialList=[None], 
+                seed=None, 
+            )
+            thisExp.addLoop(trials2)  # add the loop to the experiment
+            thisTrials2 = trials2.trialList[0]  # so we can initialise stimuli with some values
+            # abbreviate parameter names if possible (e.g. rgb = thisTrials2.rgb)
+            if thisTrials2 != None:
+                for paramName in thisTrials2:
+                    globals()[paramName] = thisTrials2[paramName]
+            if thisSession is not None:
+                # if running in a Session with a Liaison client, send data up to now
+                thisSession.sendExperimentData()
             
-            
-         
-        # store start times for reset
-        reset.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
-        reset.tStart = globalClock.getTime(format='float')
-        reset.status = STARTED
-        thisExp.addData('reset.started', reset.tStart)
-        reset.maxDuration = None
-        # keep track of which components have finished
-        resetComponents = reset.components
-        for thisComponent in reset.components:
-            thisComponent.tStart = None
-            thisComponent.tStop = None
-            thisComponent.tStartRefresh = None
-            thisComponent.tStopRefresh = None
-            if hasattr(thisComponent, 'status'):
-                thisComponent.status = NOT_STARTED
-        # reset timers
-        t = 0
-        _timeToFirstFrame = win.getFutureFlipTime(clock="now")
-        frameN = -1
-        
-        # --- Run Routine "reset" ---
-        # if trial has changed, end Routine now
-        if isinstance(blockTrials_2, data.TrialHandler2) and thisBlockTrial_2.thisN != blockTrials_2.thisTrial.thisN:
-            continueRoutine = False
-        reset.forceEnded = routineForceEnded = not continueRoutine
-        while continueRoutine:
-            # get current time
-            t = routineTimer.getTime()
-            tThisFlip = win.getFutureFlipTime(clock=routineTimer)
-            tThisFlipGlobal = win.getFutureFlipTime(clock=None)
-            frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
-            # update/draw components on each frame
-            
-            # check for quit (typically the Esc key)
-            if defaultKeyboard.getKeys(keyList=["escape"]):
-                thisExp.status = FINISHED
-            if thisExp.status == FINISHED or endExpNow:
-                endExperiment(thisExp, win=win)
-                return
-            # pause experiment here if requested
-            if thisExp.status == PAUSED:
-                pauseExperiment(
-                    thisExp=thisExp, 
-                    win=win, 
-                    timers=[routineTimer], 
-                    playbackComponents=[]
+            for thisTrials2 in trials2:
+                currentLoop = trials2
+                thisExp.timestampOnFlip(win, 'thisRow.t', format=globalClock.format)
+                if thisSession is not None:
+                    # if running in a Session with a Liaison client, send data up to now
+                    thisSession.sendExperimentData()
+                # abbreviate parameter names if possible (e.g. rgb = thisTrials2.rgb)
+                if thisTrials2 != None:
+                    for paramName in thisTrials2:
+                        globals()[paramName] = thisTrials2[paramName]
+                
+                # --- Prepare to start Routine "setup" ---
+                # create an object to store info about Routine setup
+                setup = data.Routine(
+                    name='setup',
+                    components=[fixationRed],
                 )
-                # skip the frame we paused on
-                continue
-            
-            # check if all components have finished
-            if not continueRoutine:  # a component has requested a forced-end of Routine
-                reset.forceEnded = routineForceEnded = True
-                break
-            continueRoutine = False  # will revert to True if at least one component still running
-            for thisComponent in reset.components:
-                if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
+                setup.status = NOT_STARTED
+                continueRoutine = True
+                # update component parameters for each repeat
+                # Run 'Begin Routine' code from initializationCode
+                dots.speed = 0
+                dots.dotLife = -1
+                turn = 1
+                random.seed(None)
+                 
+                startId = allPairs[currentTrialDD][0]
+                targetId = allPairs[currentTrialDD][1]
+                
+                targetReached = False
+                
+                for  lm in  landmarks:
+                    # Position it
+                    lm.pos = ((lm.idx - startId) * (landmarkWidth + interLandmarkDistance), startLandmarkY)
+                    dotsArray[lm.idx].pos = lm.pos
+                    
+                    if not visualMode:
+                        if lm.idx not in [startId-1, startId, startId+1]:
+                            lm.opacity = 0
+                             
+                        else:
+                            lm.opacity = 1
+                    else:
+                        lm.opacity = 1
+                        
+                    dotsArray[lm.idx].opacity = lm.opacity
+                    
+                    dotsArray[lm.idx].setAutoDraw(True)
+                    lm.setAutoDraw(True)
+                    
+                currentTrialDD+=1 
+                # store start times for setup
+                setup.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
+                setup.tStart = globalClock.getTime(format='float')
+                setup.status = STARTED
+                thisExp.addData('setup.started', setup.tStart)
+                setup.maxDuration = None
+                # keep track of which components have finished
+                setupComponents = setup.components
+                for thisComponent in setup.components:
+                    thisComponent.tStart = None
+                    thisComponent.tStop = None
+                    thisComponent.tStartRefresh = None
+                    thisComponent.tStopRefresh = None
+                    if hasattr(thisComponent, 'status'):
+                        thisComponent.status = NOT_STARTED
+                # reset timers
+                t = 0
+                _timeToFirstFrame = win.getFutureFlipTime(clock="now")
+                frameN = -1
+                
+                # --- Run Routine "setup" ---
+                # if trial has changed, end Routine now
+                if isinstance(trials2, data.TrialHandler2) and thisTrials2.thisN != trials2.thisTrial.thisN:
+                    continueRoutine = False
+                setup.forceEnded = routineForceEnded = not continueRoutine
+                while continueRoutine:
+                    # get current time
+                    t = routineTimer.getTime()
+                    tThisFlip = win.getFutureFlipTime(clock=routineTimer)
+                    tThisFlipGlobal = win.getFutureFlipTime(clock=None)
+                    frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
+                    # update/draw components on each frame
+                    
+                    # *fixationRed* updates
+                    
+                    # if fixationRed is starting this frame...
+                    if fixationRed.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+                        # keep track of start time/frame for later
+                        fixationRed.frameNStart = frameN  # exact frame index
+                        fixationRed.tStart = t  # local t and not account for scr refresh
+                        fixationRed.tStartRefresh = tThisFlipGlobal  # on global time
+                        win.timeOnFlip(fixationRed, 'tStartRefresh')  # time at next scr refresh
+                        # add timestamp to datafile
+                        thisExp.timestampOnFlip(win, 'fixationRed.started')
+                        # update status
+                        fixationRed.status = STARTED
+                        fixationRed.setAutoDraw(True)
+                    
+                    # if fixationRed is active this frame...
+                    if fixationRed.status == STARTED:
+                        # update params
+                        pass
+                    
+                    # if fixationRed is stopping this frame...
+                    if fixationRed.status == STARTED:
+                        # is it time to stop? (based on global clock, using actual start)
+                        if tThisFlipGlobal > fixationRed.tStartRefresh + random.uniform(0,0.5)-frameTolerance:
+                            # keep track of stop time/frame for later
+                            fixationRed.tStop = t  # not accounting for scr refresh
+                            fixationRed.tStopRefresh = tThisFlipGlobal  # on global time
+                            fixationRed.frameNStop = frameN  # exact frame index
+                            # add timestamp to datafile
+                            thisExp.timestampOnFlip(win, 'fixationRed.stopped')
+                            # update status
+                            fixationRed.status = FINISHED
+                            fixationRed.setAutoDraw(False)
+                    
+                    # check for quit (typically the Esc key)
+                    if defaultKeyboard.getKeys(keyList=["escape"]):
+                        thisExp.status = FINISHED
+                    if thisExp.status == FINISHED or endExpNow:
+                        endExperiment(thisExp, win=win)
+                        return
+                    # pause experiment here if requested
+                    if thisExp.status == PAUSED:
+                        pauseExperiment(
+                            thisExp=thisExp, 
+                            win=win, 
+                            timers=[routineTimer], 
+                            playbackComponents=[]
+                        )
+                        # skip the frame we paused on
+                        continue
+                    
+                    # check if all components have finished
+                    if not continueRoutine:  # a component has requested a forced-end of Routine
+                        setup.forceEnded = routineForceEnded = True
+                        break
+                    continueRoutine = False  # will revert to True if at least one component still running
+                    for thisComponent in setup.components:
+                        if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
+                            continueRoutine = True
+                            break  # at least one component has not yet finished
+                    
+                    # refresh the screen
+                    if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
+                        win.flip()
+                
+                # --- Ending Routine "setup" ---
+                for thisComponent in setup.components:
+                    if hasattr(thisComponent, "setAutoDraw"):
+                        thisComponent.setAutoDraw(False)
+                # store stop times for setup
+                setup.tStop = globalClock.getTime(format='float')
+                setup.tStopRefresh = tThisFlipGlobal
+                thisExp.addData('setup.stopped', setup.tStop)
+                # the Routine "setup" was not non-slip safe, so reset the non-slip timer
+                routineTimer.reset()
+                
+                # set up handler to look after randomisation of conditions etc
+                responseBlock2 = data.TrialHandler2(
+                    name='responseBlock2',
+                    nReps=2.0, 
+                    method='random', 
+                    extraInfo=expInfo, 
+                    originPath=-1, 
+                    trialList=[None], 
+                    seed=None, 
+                )
+                thisExp.addLoop(responseBlock2)  # add the loop to the experiment
+                thisResponseBlock2 = responseBlock2.trialList[0]  # so we can initialise stimuli with some values
+                # abbreviate parameter names if possible (e.g. rgb = thisResponseBlock2.rgb)
+                if thisResponseBlock2 != None:
+                    for paramName in thisResponseBlock2:
+                        globals()[paramName] = thisResponseBlock2[paramName]
+                if thisSession is not None:
+                    # if running in a Session with a Liaison client, send data up to now
+                    thisSession.sendExperimentData()
+                
+                for thisResponseBlock2 in responseBlock2:
+                    currentLoop = responseBlock2
+                    thisExp.timestampOnFlip(win, 'thisRow.t', format=globalClock.format)
+                    if thisSession is not None:
+                        # if running in a Session with a Liaison client, send data up to now
+                        thisSession.sendExperimentData()
+                    # abbreviate parameter names if possible (e.g. rgb = thisResponseBlock2.rgb)
+                    if thisResponseBlock2 != None:
+                        for paramName in thisResponseBlock2:
+                            globals()[paramName] = thisResponseBlock2[paramName]
+                    
+                    # --- Prepare to start Routine "trial" ---
+                    # create an object to store info about Routine trial
+                    trial = data.Routine(
+                        name='trial',
+                        components=[dots, targetLandmark, fixationRedTrial, keyPress, keyRelease, timeText, stopKey],
+                    )
+                    trial.status = NOT_STARTED
                     continueRoutine = True
-                    break  # at least one component has not yet finished
+                    # update component parameters for each repeat
+                    dots.refreshDots()
+                    targetLandmark.setImage('public/landmarks/images/imageset1/1.jpg')
+                    # create starting attributes for keyPress
+                    keyPress.keys = []
+                    keyPress.rt = []
+                    _keyPress_allKeys = []
+                    # create starting attributes for keyRelease
+                    keyRelease.keys = []
+                    keyRelease.rt = []
+                    _keyRelease_allKeys = []
+                    # Run 'Begin Routine' code from move_images
+                    ## add logic to  add all images on a line
+                    dots.speed = 0
+                    dots.dotLife = -1
+                    closestLMs = sorted(landmarks,key=lambda x:abs(x.pos[0]),reverse=False)
+                    
+                    if visualMode:
+                        for index,lm  in  enumerate(closestLMs):
+                            lm.opacity = 1  
+                    else:
+                        closestLMs[0].opacity = 1
+                        closestIdx = closestLMs[0].idx
+                        leftLM = landmarks[closestIdx-1] if closestIdx>0 else landmarks[closestIdx]
+                        leftLM.opacity = 1
+                        rightLM = landmarks[closestIdx+1] if closestIdx<6 else landmarks[closestIdx]
+                        rightLM.opacity = 1
+                        
+                        
+                    targetLandmark.opacity = 1
+                            
+                    targetLandmark.image = f'public/landmarks/images/imageset1/{targetId}.jpg'
+                    
+                        
+                    if targetReached:
+                        score += 1
+                        continueRoutine = False
+                        
+                    # create starting attributes for stopKey
+                    stopKey.keys = []
+                    stopKey.rt = []
+                    _stopKey_allKeys = []
+                    # store start times for trial
+                    trial.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
+                    trial.tStart = globalClock.getTime(format='float')
+                    trial.status = STARTED
+                    thisExp.addData('trial.started', trial.tStart)
+                    trial.maxDuration = None
+                    # keep track of which components have finished
+                    trialComponents = trial.components
+                    for thisComponent in trial.components:
+                        thisComponent.tStart = None
+                        thisComponent.tStop = None
+                        thisComponent.tStartRefresh = None
+                        thisComponent.tStopRefresh = None
+                        if hasattr(thisComponent, 'status'):
+                            thisComponent.status = NOT_STARTED
+                    # reset timers
+                    t = 0
+                    _timeToFirstFrame = win.getFutureFlipTime(clock="now")
+                    frameN = -1
+                    
+                    # --- Run Routine "trial" ---
+                    # if trial has changed, end Routine now
+                    if isinstance(responseBlock2, data.TrialHandler2) and thisResponseBlock2.thisN != responseBlock2.thisTrial.thisN:
+                        continueRoutine = False
+                    trial.forceEnded = routineForceEnded = not continueRoutine
+                    while continueRoutine:
+                        # get current time
+                        t = routineTimer.getTime()
+                        tThisFlip = win.getFutureFlipTime(clock=routineTimer)
+                        tThisFlipGlobal = win.getFutureFlipTime(clock=None)
+                        frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
+                        # update/draw components on each frame
+                        
+                        # *dots* updates
+                        
+                        # if dots is starting this frame...
+                        if dots.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+                            # keep track of start time/frame for later
+                            dots.frameNStart = frameN  # exact frame index
+                            dots.tStart = t  # local t and not account for scr refresh
+                            dots.tStartRefresh = tThisFlipGlobal  # on global time
+                            win.timeOnFlip(dots, 'tStartRefresh')  # time at next scr refresh
+                            # add timestamp to datafile
+                            thisExp.timestampOnFlip(win, 'dots.started')
+                            # update status
+                            dots.status = STARTED
+                            dots.setAutoDraw(True)
+                        
+                        # if dots is active this frame...
+                        if dots.status == STARTED:
+                            # update params
+                            pass
+                        
+                        # *targetLandmark* updates
+                        
+                        # if targetLandmark is starting this frame...
+                        if targetLandmark.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+                            # keep track of start time/frame for later
+                            targetLandmark.frameNStart = frameN  # exact frame index
+                            targetLandmark.tStart = t  # local t and not account for scr refresh
+                            targetLandmark.tStartRefresh = tThisFlipGlobal  # on global time
+                            win.timeOnFlip(targetLandmark, 'tStartRefresh')  # time at next scr refresh
+                            # add timestamp to datafile
+                            thisExp.timestampOnFlip(win, 'targetLandmark.started')
+                            # update status
+                            targetLandmark.status = STARTED
+                            targetLandmark.setAutoDraw(True)
+                        
+                        # if targetLandmark is active this frame...
+                        if targetLandmark.status == STARTED:
+                            # update params
+                            pass
+                        
+                        # *fixationRedTrial* updates
+                        
+                        # if fixationRedTrial is starting this frame...
+                        if fixationRedTrial.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+                            # keep track of start time/frame for later
+                            fixationRedTrial.frameNStart = frameN  # exact frame index
+                            fixationRedTrial.tStart = t  # local t and not account for scr refresh
+                            fixationRedTrial.tStartRefresh = tThisFlipGlobal  # on global time
+                            win.timeOnFlip(fixationRedTrial, 'tStartRefresh')  # time at next scr refresh
+                            # add timestamp to datafile
+                            thisExp.timestampOnFlip(win, 'fixationRedTrial.started')
+                            # update status
+                            fixationRedTrial.status = STARTED
+                            fixationRedTrial.setAutoDraw(True)
+                        
+                        # if fixationRedTrial is active this frame...
+                        if fixationRedTrial.status == STARTED:
+                            # update params
+                            pass
+                        
+                        # *keyPress* updates
+                        waitOnFlip = False
+                        
+                        # if keyPress is starting this frame...
+                        if keyPress.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+                            # keep track of start time/frame for later
+                            keyPress.frameNStart = frameN  # exact frame index
+                            keyPress.tStart = t  # local t and not account for scr refresh
+                            keyPress.tStartRefresh = tThisFlipGlobal  # on global time
+                            win.timeOnFlip(keyPress, 'tStartRefresh')  # time at next scr refresh
+                            # add timestamp to datafile
+                            thisExp.timestampOnFlip(win, 'keyPress.started')
+                            # update status
+                            keyPress.status = STARTED
+                            # keyboard checking is just starting
+                            waitOnFlip = True
+                            win.callOnFlip(keyPress.clock.reset)  # t=0 on next screen flip
+                            win.callOnFlip(keyPress.clearEvents, eventType='keyboard')  # clear events on next screen flip
+                        if keyPress.status == STARTED and not waitOnFlip:
+                            theseKeys = keyPress.getKeys(keyList=['left','right'], ignoreKeys=["escape"], waitRelease=False)
+                            _keyPress_allKeys.extend(theseKeys)
+                            if len(_keyPress_allKeys):
+                                keyPress.keys = _keyPress_allKeys[-1].name  # just the last key pressed
+                                keyPress.rt = _keyPress_allKeys[-1].rt
+                                keyPress.duration = _keyPress_allKeys[-1].duration
+                        
+                        # *keyRelease* updates
+                        waitOnFlip = False
+                        
+                        # if keyRelease is starting this frame...
+                        if keyRelease.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+                            # keep track of start time/frame for later
+                            keyRelease.frameNStart = frameN  # exact frame index
+                            keyRelease.tStart = t  # local t and not account for scr refresh
+                            keyRelease.tStartRefresh = tThisFlipGlobal  # on global time
+                            win.timeOnFlip(keyRelease, 'tStartRefresh')  # time at next scr refresh
+                            # add timestamp to datafile
+                            thisExp.timestampOnFlip(win, 'keyRelease.started')
+                            # update status
+                            keyRelease.status = STARTED
+                            # keyboard checking is just starting
+                            waitOnFlip = True
+                            win.callOnFlip(keyRelease.clock.reset)  # t=0 on next screen flip
+                            win.callOnFlip(keyRelease.clearEvents, eventType='keyboard')  # clear events on next screen flip
+                        if keyRelease.status == STARTED and not waitOnFlip:
+                            theseKeys = keyRelease.getKeys(keyList=['left','right'], ignoreKeys=["escape"], waitRelease=True)
+                            _keyRelease_allKeys.extend(theseKeys)
+                            if len(_keyRelease_allKeys):
+                                keyRelease.keys = _keyRelease_allKeys[-1].name  # just the last key pressed
+                                keyRelease.rt = _keyRelease_allKeys[-1].rt
+                                keyRelease.duration = _keyRelease_allKeys[-1].duration
+                                # a response ends the routine
+                                continueRoutine = False
+                        # Run 'Each Frame' code from move_images
+                        ## add logic to  move the image for each frame    
+                        if loopName == "blockTrials":
+                            completedTrials  = blockTrials.thisN
+                        elif loopName == "blockTrials_2":
+                            completedTrials = blockTrials_2.thisN
+                        
+                        if devMode:    
+                            statusText = f"Current Time : {str(int(expClock.getTime()))} \n Completed Trials:{completedTrials}/{currentTrialDD} \n Score: {score} \n Speed: {speed} \n Step Size : {dt} \n Visual : {visualMode} " 
+                        else:
+                            statusText = ''
+                            
+                        timeText.setText(statusText)
+                            
+                        if  keyRelease.keys == 'left' or keyRelease.keys == 'right':
+                            targetReached = abs(landmarks[targetId].pos[0])   <= tolerance * landmarkWidth
+                            dots.dir =  0
+                            dots.dotLife = -1
+                            dots.speed = 0
+                            
+                        if keyPress.keys == 'left' or keyPress.keys  == 'right':
+                            if not visualMode:
+                                for lm in  landmarks:
+                                    lm.opacity = 0
+                                    dotsArray[lm.idx].opacity = 0
+                                targetLandmark.opacity = 0
+                                
+                        if  keyPress.keys == 'left':
+                            dots.dir =  180
+                            for lm in landmarks:
+                                if  landmarks[-1].pos[0]<-1*edgeLandmarkDistance:
+                                    break
+                                lm.pos -= (speed*dt,0)
+                                dotsArray[lm.idx].pos -= (speed*dt,0)
+                        
+                            if  landmarks[-1].pos[0]<-1*edgeLandmarkDistance:
+                                dots.speed = 0
+                                dots.dotLife = -1
+                            else:
+                                dots.speed =  speed*dt
+                                dots.dotLife = dotLife
+                            
+                        elif  keyPress.keys == 'right':
+                            dots.dir = 0
+                            for lm in landmarks:
+                                if  landmarks[0].pos[0]>edgeLandmarkDistance:
+                                    break
+                                lm.pos += (speed*dt,0)
+                                dotsArray[lm.idx].pos += (speed*dt,0)
+                            if  landmarks[0].pos[0]>edgeLandmarkDistance:
+                                dots.speed = 0
+                                dots.dotLife = -1
+                            else:
+                                dots.speed =  speed*dt
+                                dots.dotLife = dotLife
+                        
+                        
+                        
+                        for lm in landmarks:
+                            dotsArray[lm.idx].opacity = lm.opacity
+                        
+                        
+                         
+                        
+                        # *timeText* updates
+                        
+                        # if timeText is starting this frame...
+                        if timeText.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+                            # keep track of start time/frame for later
+                            timeText.frameNStart = frameN  # exact frame index
+                            timeText.tStart = t  # local t and not account for scr refresh
+                            timeText.tStartRefresh = tThisFlipGlobal  # on global time
+                            win.timeOnFlip(timeText, 'tStartRefresh')  # time at next scr refresh
+                            # add timestamp to datafile
+                            thisExp.timestampOnFlip(win, 'timeText.started')
+                            # update status
+                            timeText.status = STARTED
+                            timeText.setAutoDraw(True)
+                        
+                        # if timeText is active this frame...
+                        if timeText.status == STARTED:
+                            # update params
+                            pass
+                        
+                        # *stopKey* updates
+                        waitOnFlip = False
+                        
+                        # if stopKey is starting this frame...
+                        if stopKey.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+                            # keep track of start time/frame for later
+                            stopKey.frameNStart = frameN  # exact frame index
+                            stopKey.tStart = t  # local t and not account for scr refresh
+                            stopKey.tStartRefresh = tThisFlipGlobal  # on global time
+                            win.timeOnFlip(stopKey, 'tStartRefresh')  # time at next scr refresh
+                            # add timestamp to datafile
+                            thisExp.timestampOnFlip(win, 'stopKey.started')
+                            # update status
+                            stopKey.status = STARTED
+                            # keyboard checking is just starting
+                            waitOnFlip = True
+                            win.callOnFlip(stopKey.clock.reset)  # t=0 on next screen flip
+                            win.callOnFlip(stopKey.clearEvents, eventType='keyboard')  # clear events on next screen flip
+                        if stopKey.status == STARTED and not waitOnFlip:
+                            theseKeys = stopKey.getKeys(keyList=['s'], ignoreKeys=["escape"], waitRelease=False)
+                            _stopKey_allKeys.extend(theseKeys)
+                            if len(_stopKey_allKeys):
+                                stopKey.keys = _stopKey_allKeys[-1].name  # just the last key pressed
+                                stopKey.rt = _stopKey_allKeys[-1].rt
+                                stopKey.duration = _stopKey_allKeys[-1].duration
+                                # a response ends the routine
+                                continueRoutine = False
+                        
+                        # check for quit (typically the Esc key)
+                        if defaultKeyboard.getKeys(keyList=["escape"]):
+                            thisExp.status = FINISHED
+                        if thisExp.status == FINISHED or endExpNow:
+                            endExperiment(thisExp, win=win)
+                            return
+                        # pause experiment here if requested
+                        if thisExp.status == PAUSED:
+                            pauseExperiment(
+                                thisExp=thisExp, 
+                                win=win, 
+                                timers=[routineTimer], 
+                                playbackComponents=[]
+                            )
+                            # skip the frame we paused on
+                            continue
+                        
+                        # check if all components have finished
+                        if not continueRoutine:  # a component has requested a forced-end of Routine
+                            trial.forceEnded = routineForceEnded = True
+                            break
+                        continueRoutine = False  # will revert to True if at least one component still running
+                        for thisComponent in trial.components:
+                            if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
+                                continueRoutine = True
+                                break  # at least one component has not yet finished
+                        
+                        # refresh the screen
+                        if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
+                            win.flip()
+                    
+                    # --- Ending Routine "trial" ---
+                    for thisComponent in trial.components:
+                        if hasattr(thisComponent, "setAutoDraw"):
+                            thisComponent.setAutoDraw(False)
+                    # store stop times for trial
+                    trial.tStop = globalClock.getTime(format='float')
+                    trial.tStopRefresh = tThisFlipGlobal
+                    thisExp.addData('trial.stopped', trial.tStop)
+                    # check responses
+                    if keyPress.keys in ['', [], None]:  # No response was made
+                        keyPress.keys = None
+                    responseBlock2.addData('keyPress.keys',keyPress.keys)
+                    if keyPress.keys != None:  # we had a response
+                        responseBlock2.addData('keyPress.rt', keyPress.rt)
+                        responseBlock2.addData('keyPress.duration', keyPress.duration)
+                    # check responses
+                    if keyRelease.keys in ['', [], None]:  # No response was made
+                        keyRelease.keys = None
+                    responseBlock2.addData('keyRelease.keys',keyRelease.keys)
+                    if keyRelease.keys != None:  # we had a response
+                        responseBlock2.addData('keyRelease.rt', keyRelease.rt)
+                        responseBlock2.addData('keyRelease.duration', keyRelease.duration)
+                    # Run 'End Routine' code from move_images
+                    ## check if start and target is same
+                    
+                    
+                    # check responses
+                    if stopKey.keys in ['', [], None]:  # No response was made
+                        stopKey.keys = None
+                    responseBlock2.addData('stopKey.keys',stopKey.keys)
+                    if stopKey.keys != None:  # we had a response
+                        responseBlock2.addData('stopKey.rt', stopKey.rt)
+                        responseBlock2.addData('stopKey.duration', stopKey.duration)
+                    # the Routine "trial" was not non-slip safe, so reset the non-slip timer
+                    routineTimer.reset()
+                    thisExp.nextEntry()
+                    
+                # completed 2.0 repeats of 'responseBlock2'
+                
+                if thisSession is not None:
+                    # if running in a Session with a Liaison client, send data up to now
+                    thisSession.sendExperimentData()
+                
+                # --- Prepare to start Routine "reset" ---
+                # create an object to store info about Routine reset
+                reset = data.Routine(
+                    name='reset',
+                    components=[],
+                )
+                reset.status = NOT_STARTED
+                continueRoutine = True
+                # update component parameters for each repeat
+                # Run 'Begin Routine' code from resetCode
+                #core.wait(0.5)
+                
+                for index,lm in enumerate(landmarks):
+                    lm.opacity = 0
+                    dotsArray[index].opacity = 0
+                
+                eyeRecord = False
+                
+                if stopKey.keys == 's':
+                    print("Stopping experiment sending bye signal.")
+                    continueRoutine = False
+                    experimentExpired = True
+                    
+                if expClock.getTime()>=totalTime:
+                    print("Time limit reached. Ending experiment")
+                    continueRoutine = False
+                    experimentExpired = True
+                    
+                    
+                    
+                 
+                # store start times for reset
+                reset.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
+                reset.tStart = globalClock.getTime(format='float')
+                reset.status = STARTED
+                thisExp.addData('reset.started', reset.tStart)
+                reset.maxDuration = None
+                # keep track of which components have finished
+                resetComponents = reset.components
+                for thisComponent in reset.components:
+                    thisComponent.tStart = None
+                    thisComponent.tStop = None
+                    thisComponent.tStartRefresh = None
+                    thisComponent.tStopRefresh = None
+                    if hasattr(thisComponent, 'status'):
+                        thisComponent.status = NOT_STARTED
+                # reset timers
+                t = 0
+                _timeToFirstFrame = win.getFutureFlipTime(clock="now")
+                frameN = -1
+                
+                # --- Run Routine "reset" ---
+                # if trial has changed, end Routine now
+                if isinstance(trials2, data.TrialHandler2) and thisTrials2.thisN != trials2.thisTrial.thisN:
+                    continueRoutine = False
+                reset.forceEnded = routineForceEnded = not continueRoutine
+                while continueRoutine:
+                    # get current time
+                    t = routineTimer.getTime()
+                    tThisFlip = win.getFutureFlipTime(clock=routineTimer)
+                    tThisFlipGlobal = win.getFutureFlipTime(clock=None)
+                    frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
+                    # update/draw components on each frame
+                    
+                    # check for quit (typically the Esc key)
+                    if defaultKeyboard.getKeys(keyList=["escape"]):
+                        thisExp.status = FINISHED
+                    if thisExp.status == FINISHED or endExpNow:
+                        endExperiment(thisExp, win=win)
+                        return
+                    # pause experiment here if requested
+                    if thisExp.status == PAUSED:
+                        pauseExperiment(
+                            thisExp=thisExp, 
+                            win=win, 
+                            timers=[routineTimer], 
+                            playbackComponents=[]
+                        )
+                        # skip the frame we paused on
+                        continue
+                    
+                    # check if all components have finished
+                    if not continueRoutine:  # a component has requested a forced-end of Routine
+                        reset.forceEnded = routineForceEnded = True
+                        break
+                    continueRoutine = False  # will revert to True if at least one component still running
+                    for thisComponent in reset.components:
+                        if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
+                            continueRoutine = True
+                            break  # at least one component has not yet finished
+                    
+                    # refresh the screen
+                    if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
+                        win.flip()
+                
+                # --- Ending Routine "reset" ---
+                for thisComponent in reset.components:
+                    if hasattr(thisComponent, "setAutoDraw"):
+                        thisComponent.setAutoDraw(False)
+                # store stop times for reset
+                reset.tStop = globalClock.getTime(format='float')
+                reset.tStopRefresh = tThisFlipGlobal
+                thisExp.addData('reset.stopped', reset.tStop)
+                # Run 'End Routine' code from resetCode
+                
+                if 'experimentExpired' in globals() and experimentExpired:
+                    print("Received experiment expired signal. Bye")
+                
+                    # Try to end the outer loop, whatever it's named
+                    if loopName == "blockTrials":
+                        blockTrials.finished = True
+                    elif loopName == "breakLoop":
+                        trials2.finished = True
+                        blockTrials2.finished =True 
+                        breakLoop.finished = True
+                
+                thisExp.addData('speed',speed)
+                thisExp.addData('stepSize',dt)
+                thisExp.addData('speed',speed)
+                thisExp.addData('startId',startId)
+                thisExp.addData('targetId',targetId)
+                thisExp.addData('startLandmarkPos',landmarks[startId].pos)
+                thisExp.addData('experimentExpired',experimentExpired)
+                thisExp.addData('visualMode',visualMode)
+                thisExp.addData('devMode',devMode)
+                thisExp.addData(f'{loopName}_duration',expClock.getTime())
+                thisExp.addData('turn',turn)
+                # the Routine "reset" was not non-slip safe, so reset the non-slip timer
+                routineTimer.reset()
+                thisExp.nextEntry()
+                
+            # completed 10.0 repeats of 'trials2'
             
-            # refresh the screen
-            if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
-                win.flip()
+            if thisSession is not None:
+                # if running in a Session with a Liaison client, send data up to now
+                thisSession.sendExperimentData()
+            thisExp.nextEntry()
+            
+        # completed 5.0 repeats of 'blockTrials2'
         
-        # --- Ending Routine "reset" ---
-        for thisComponent in reset.components:
-            if hasattr(thisComponent, "setAutoDraw"):
-                thisComponent.setAutoDraw(False)
-        # store stop times for reset
-        reset.tStop = globalClock.getTime(format='float')
-        reset.tStopRefresh = tThisFlipGlobal
-        thisExp.addData('reset.stopped', reset.tStop)
-        # Run 'End Routine' code from resetCode
-        if 'experimentExpired' in globals() and experimentExpired:
-            print("Received experiment expired signal. Bye")
-        
-            # Try to end the outer loop, whatever it's named
-            if loopName == "blockTrials":
-                blockTrials.finished = True
-            elif loopName == "blockTrials_2":
-                blockTrials_2.finished = True
-        
-        
-        currentTrialDD+=1
-        
-        thisExp.addData('speed',speed)
-        thisExp.addData('stepSize',dt)
-        thisExp.addData('speed',speed)
-        thisExp.addData('startId',startId)
-        thisExp.addData('targetId',targetId)
-        thisExp.addData('startLandmarkPos',landmarks[startId].pos)
-        thisExp.addData('experimentExpired',experimentExpired)
-        thisExp.addData('visualMode',visualMode)
-        thisExp.addData('devMode',devMode)
-        thisExp.addData(f'{loopName}_duration',expClock.getTime())
-        
-        
-        del landmarks
-        del dotsArray
-        
-        # the Routine "reset" was not non-slip safe, so reset the non-slip timer
-        routineTimer.reset()
-        thisExp.nextEntry()
-        
-    # completed 0.0 repeats of 'blockTrials_2'
+        if thisSession is not None:
+            # if running in a Session with a Liaison client, send data up to now
+            thisSession.sendExperimentData()
+    # completed 6.0 repeats of 'breakLoop'
     
-    if thisSession is not None:
-        # if running in a Session with a Liaison client, send data up to now
-        thisSession.sendExperimentData()
     
     # --- Prepare to start Routine "stopEye" ---
     # create an object to store info about Routine stopEye
