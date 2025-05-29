@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2024.2.4),
-    on Thu May 29 18:07:22 2025
+    on Thu May 29 18:14:31 2025
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -297,17 +297,17 @@ def setupDevices(expInfo, thisExp, win):
             deviceClass='keyboard',
             deviceName='stopKey',
         )
-    if deviceManager.getDevice('key_resp_2') is None:
-        # initialise key_resp_2
-        key_resp_2 = deviceManager.addDevice(
-            deviceClass='keyboard',
-            deviceName='key_resp_2',
-        )
     if deviceManager.getDevice('stopResp') is None:
         # initialise stopResp
         stopResp = deviceManager.addDevice(
             deviceClass='keyboard',
             deviceName='stopResp',
+        )
+    if deviceManager.getDevice('key_resp_2') is None:
+        # initialise key_resp_2
+        key_resp_2 = deviceManager.addDevice(
+            deviceClass='keyboard',
+            deviceName='key_resp_2',
         )
     if deviceManager.getDevice('keyEnd') is None:
         # initialise keyEnd
@@ -542,6 +542,16 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     
     # --- Initialize components for Routine "reset" ---
     
+    # --- Initialize components for Routine "stopEye" ---
+    text_3 = visual.TextStim(win=win, name='text_3',
+        text='Stop Eye Tracking.\n\nPress space to proceed.',
+        font='Arial',
+        pos=(0, 0), draggable=False, height=1.0, wrapWidth=None, ori=0.0, 
+        color='white', colorSpace='rgb', opacity=None, 
+        languageStyle='LTR',
+        depth=0.0);
+    stopResp = keyboard.Keyboard(deviceName='stopResp')
+    
     # --- Initialize components for Routine "breakRoutine" ---
     breakText = visual.TextStim(win=win, name='breakText',
         text="This concludes this part of the experiment.\n\nPlease take a short break and press the space key when you're ready to proceed to the next part",
@@ -551,6 +561,10 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         languageStyle='LTR',
         depth=0.0);
     key_resp_2 = keyboard.Keyboard(deviceName='key_resp_2')
+    
+    # --- Initialize components for Routine "startRecord" ---
+    CameraSetup2 = event.Mouse(win=win)
+    StartRecord2 = event.Mouse(win=win)
     
     # --- Initialize components for Routine "blockSetup" ---
     
@@ -1901,6 +1915,145 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     # completed len(speedOptions) repeats of 'blockTrials'
     
     
+    # --- Prepare to start Routine "stopEye" ---
+    # create an object to store info about Routine stopEye
+    stopEye = data.Routine(
+        name='stopEye',
+        components=[text_3, stopResp],
+    )
+    stopEye.status = NOT_STARTED
+    continueRoutine = True
+    # update component parameters for each repeat
+    # create starting attributes for stopResp
+    stopResp.keys = []
+    stopResp.rt = []
+    _stopResp_allKeys = []
+    # store start times for stopEye
+    stopEye.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
+    stopEye.tStart = globalClock.getTime(format='float')
+    stopEye.status = STARTED
+    stopEye.maxDuration = None
+    # keep track of which components have finished
+    stopEyeComponents = stopEye.components
+    for thisComponent in stopEye.components:
+        thisComponent.tStart = None
+        thisComponent.tStop = None
+        thisComponent.tStartRefresh = None
+        thisComponent.tStopRefresh = None
+        if hasattr(thisComponent, 'status'):
+            thisComponent.status = NOT_STARTED
+    # reset timers
+    t = 0
+    _timeToFirstFrame = win.getFutureFlipTime(clock="now")
+    frameN = -1
+    
+    # --- Run Routine "stopEye" ---
+    stopEye.forceEnded = routineForceEnded = not continueRoutine
+    while continueRoutine:
+        # get current time
+        t = routineTimer.getTime()
+        tThisFlip = win.getFutureFlipTime(clock=routineTimer)
+        tThisFlipGlobal = win.getFutureFlipTime(clock=None)
+        frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
+        # update/draw components on each frame
+        
+        # *text_3* updates
+        
+        # if text_3 is starting this frame...
+        if text_3.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+            # keep track of start time/frame for later
+            text_3.frameNStart = frameN  # exact frame index
+            text_3.tStart = t  # local t and not account for scr refresh
+            text_3.tStartRefresh = tThisFlipGlobal  # on global time
+            win.timeOnFlip(text_3, 'tStartRefresh')  # time at next scr refresh
+            # add timestamp to datafile
+            thisExp.timestampOnFlip(win, 'text_3.started')
+            # update status
+            text_3.status = STARTED
+            text_3.setAutoDraw(True)
+        
+        # if text_3 is active this frame...
+        if text_3.status == STARTED:
+            # update params
+            pass
+        
+        # *stopResp* updates
+        waitOnFlip = False
+        
+        # if stopResp is starting this frame...
+        if stopResp.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+            # keep track of start time/frame for later
+            stopResp.frameNStart = frameN  # exact frame index
+            stopResp.tStart = t  # local t and not account for scr refresh
+            stopResp.tStartRefresh = tThisFlipGlobal  # on global time
+            win.timeOnFlip(stopResp, 'tStartRefresh')  # time at next scr refresh
+            # add timestamp to datafile
+            thisExp.timestampOnFlip(win, 'stopResp.started')
+            # update status
+            stopResp.status = STARTED
+            # keyboard checking is just starting
+            waitOnFlip = True
+            win.callOnFlip(stopResp.clock.reset)  # t=0 on next screen flip
+            win.callOnFlip(stopResp.clearEvents, eventType='keyboard')  # clear events on next screen flip
+        if stopResp.status == STARTED and not waitOnFlip:
+            theseKeys = stopResp.getKeys(keyList=['space'], ignoreKeys=["escape"], waitRelease=False)
+            _stopResp_allKeys.extend(theseKeys)
+            if len(_stopResp_allKeys):
+                stopResp.keys = _stopResp_allKeys[-1].name  # just the last key pressed
+                stopResp.rt = _stopResp_allKeys[-1].rt
+                stopResp.duration = _stopResp_allKeys[-1].duration
+                # a response ends the routine
+                continueRoutine = False
+        
+        # check for quit (typically the Esc key)
+        if defaultKeyboard.getKeys(keyList=["escape"]):
+            thisExp.status = FINISHED
+        if thisExp.status == FINISHED or endExpNow:
+            endExperiment(thisExp, win=win)
+            return
+        # pause experiment here if requested
+        if thisExp.status == PAUSED:
+            pauseExperiment(
+                thisExp=thisExp, 
+                win=win, 
+                timers=[routineTimer], 
+                playbackComponents=[]
+            )
+            # skip the frame we paused on
+            continue
+        
+        # check if all components have finished
+        if not continueRoutine:  # a component has requested a forced-end of Routine
+            stopEye.forceEnded = routineForceEnded = True
+            break
+        continueRoutine = False  # will revert to True if at least one component still running
+        for thisComponent in stopEye.components:
+            if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
+                continueRoutine = True
+                break  # at least one component has not yet finished
+        
+        # refresh the screen
+        if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
+            win.flip()
+    
+    # --- Ending Routine "stopEye" ---
+    for thisComponent in stopEye.components:
+        if hasattr(thisComponent, "setAutoDraw"):
+            thisComponent.setAutoDraw(False)
+    # store stop times for stopEye
+    stopEye.tStop = globalClock.getTime(format='float')
+    stopEye.tStopRefresh = tThisFlipGlobal
+    # check responses
+    if stopResp.keys in ['', [], None]:  # No response was made
+        stopResp.keys = None
+    thisExp.addData('stopResp.keys',stopResp.keys)
+    if stopResp.keys != None:  # we had a response
+        thisExp.addData('stopResp.rt', stopResp.rt)
+        thisExp.addData('stopResp.duration', stopResp.duration)
+    thisExp.nextEntry()
+    # the Routine "stopEye" was not non-slip safe, so reset the non-slip timer
+    routineTimer.reset()
+    
     # set up handler to look after randomisation of conditions etc
     breakLoop = data.TrialHandler2(
         name='breakLoop',
@@ -2075,6 +2228,176 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             breakLoop.addData('key_resp_2.duration', key_resp_2.duration)
         # the Routine "breakRoutine" was not non-slip safe, so reset the non-slip timer
         routineTimer.reset()
+        
+        # --- Prepare to start Routine "startRecord" ---
+        # create an object to store info about Routine startRecord
+        startRecord = data.Routine(
+            name='startRecord',
+            components=[CameraSetup2, StartRecord2],
+        )
+        startRecord.status = NOT_STARTED
+        continueRoutine = True
+        # update component parameters for each repeat
+        # store start times for startRecord
+        startRecord.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
+        startRecord.tStart = globalClock.getTime(format='float')
+        startRecord.status = STARTED
+        thisExp.addData('startRecord.started', startRecord.tStart)
+        startRecord.maxDuration = None
+        # keep track of which components have finished
+        startRecordComponents = startRecord.components
+        for thisComponent in startRecord.components:
+            thisComponent.tStart = None
+            thisComponent.tStop = None
+            thisComponent.tStartRefresh = None
+            thisComponent.tStopRefresh = None
+            if hasattr(thisComponent, 'status'):
+                thisComponent.status = NOT_STARTED
+        # reset timers
+        t = 0
+        _timeToFirstFrame = win.getFutureFlipTime(clock="now")
+        frameN = -1
+        
+        # --- Run Routine "startRecord" ---
+        # if trial has changed, end Routine now
+        if isinstance(breakLoop, data.TrialHandler2) and thisBreakLoop.thisN != breakLoop.thisTrial.thisN:
+            continueRoutine = False
+        startRecord.forceEnded = routineForceEnded = not continueRoutine
+        while continueRoutine and routineTimer.getTime() < 0.001:
+            # get current time
+            t = routineTimer.getTime()
+            tThisFlip = win.getFutureFlipTime(clock=routineTimer)
+            tThisFlipGlobal = win.getFutureFlipTime(clock=None)
+            frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
+            # update/draw components on each frame
+            
+            # check for quit (typically the Esc key)
+            if defaultKeyboard.getKeys(keyList=["escape"]):
+                thisExp.status = FINISHED
+            if thisExp.status == FINISHED or endExpNow:
+                endExperiment(thisExp, win=win)
+                return
+            # pause experiment here if requested
+            if thisExp.status == PAUSED:
+                pauseExperiment(
+                    thisExp=thisExp, 
+                    win=win, 
+                    timers=[routineTimer], 
+                    playbackComponents=[]
+                )
+                # skip the frame we paused on
+                continue
+            
+            # check if all components have finished
+            if not continueRoutine:  # a component has requested a forced-end of Routine
+                startRecord.forceEnded = routineForceEnded = True
+                break
+            continueRoutine = False  # will revert to True if at least one component still running
+            for thisComponent in startRecord.components:
+                if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
+                    continueRoutine = True
+                    break  # at least one component has not yet finished
+            
+            # refresh the screen
+            if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
+                win.flip()
+        
+        # --- Ending Routine "startRecord" ---
+        for thisComponent in startRecord.components:
+            if hasattr(thisComponent, "setAutoDraw"):
+                thisComponent.setAutoDraw(False)
+        # store stop times for startRecord
+        startRecord.tStop = globalClock.getTime(format='float')
+        startRecord.tStopRefresh = tThisFlipGlobal
+        thisExp.addData('startRecord.stopped', startRecord.tStop)
+        # This section of EyeLink CameraSetup2 component code configures some
+        # graphics options for calibration, and then performs a camera setup
+        # so that you can set up the eye tracker and calibrate/validate the participant
+        # graphics options for calibration, and then performs a camera setup
+        # so that you can set up the eye tracker and calibrate/validate the participant
+        
+        # Set background and foreground colors for the calibration target
+        # in PsychoPy, (-1, -1, -1)=black, (1, 1, 1)=white, (0, 0, 0)=mid-gray
+        background_color = win.color
+        foreground_color = (1,1,1)
+        genv.setCalibrationColors(foreground_color, background_color)
+        
+        # Set up the calibration/validation target
+        #
+        # The target could be a "circle" (default), a "picture", a "movie" clip,
+        # or a rotating "spiral". To configure the type of drift check target, set
+        # genv.setTargetType to "circle", "picture", "movie", or "spiral", e.g.,
+        genv.setTargetType('circle')
+        #
+        genv.setTargetSize(24)
+        
+        # Beeps to play during calibration, validation and drift correction
+        # parameters: target, good, error
+        #     target -- sound to play when target moves
+        #     good -- sound to play on successful operation
+        #     error -- sound to play on failure or interruption
+        # Each parameter could be ''--default sound, 'off'--no sound, or a wav file
+        genv.setCalibrationSounds('', '', '')
+        
+        # Choose a calibration type, H3, HV3, HV5, HV13 (HV = horizontal/vertical),
+        el_tracker.sendCommand("calibration_type = " 'HV9')
+        #clear the screen before we begin Camera Setup mode
+        clear_screen(win,genv)
+        
+        
+        # Go into Camera Setup mode so that participant setup/EyeLink calibration/validation can be performed
+        # skip this step if running the script in Dummy Mode
+        if not dummy_mode:
+            try:
+                el_tracker.doTrackerSetup()
+            except RuntimeError as err:
+                print('ERROR:', err)
+                el_tracker.exitCalibration()
+            else:
+                win.mouseVisible = False
+        # This section of EyeLink StartRecord2 component code starts eye tracker recording,
+        # sends a trial start (i.e., TRIALID) message to the EDF, 
+        # and logs which eye is tracked
+        
+        # get a reference to the currently active EyeLink connection
+        el_tracker = pylink.getEYELINK()
+        # Send a "TRIALID" message to mark the start of a trial, see the following Data Viewer User Manual:
+        # "Protocol for EyeLink Data to Viewer Integration -> Defining the Start and End of a Trial"
+        el_tracker.sendMessage('TRIALID %d' % trial_index)
+        # Log the trial index at the start of recording in case there will be multiple trials within one recording
+        trialIDAtRecordingStart = int(trial_index)
+        # Log the routine index at the start of recording in case there will be multiple routines within one recording
+        routine_index = 1
+        # put tracker in idle/offline mode before recording
+        el_tracker.setOfflineMode()
+        # Start recording, logging all samples/events to the EDF and making all data available over the link
+        # arguments: sample_to_file, events_to_file, sample_over_link, events_over_link (1-yes, 0-no)
+        try:
+            el_tracker.startRecording(1, 1, 1, 1)
+        except RuntimeError as error:
+            print("ERROR:", error)
+            abort_trial(genv)
+        # Allocate some time for the tracker to cache some samples before allowing
+        # trial stimulus presentation to proceed
+        pylink.pumpDelay(100)
+        # determine which eye(s) is/are available
+        # 0-left, 1-right, 2-binocular
+        eye_used = el_tracker.eyeAvailable()
+        if eye_used == 1:
+            el_tracker.sendMessage("EYE_USED 1 RIGHT")
+        elif eye_used == 0 or eye_used == 2:
+            el_tracker.sendMessage("EYE_USED 0 LEFT")
+            eye_used = 0
+        else:
+            print("ERROR: Could not get eye information!")
+        #routineForceEnded = True
+        # using non-slip timing so subtract the expected duration of this Routine (unless ended on request)
+        if startRecord.maxDurationReached:
+            routineTimer.addTime(-startRecord.maxDuration)
+        elif startRecord.forceEnded:
+            routineTimer.reset()
+        else:
+            routineTimer.addTime(-0.001000)
         
         # set up handler to look after randomisation of conditions etc
         blockTrials2 = data.TrialHandler2(
@@ -2930,147 +3253,149 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         if thisSession is not None:
             # if running in a Session with a Liaison client, send data up to now
             thisSession.sendExperimentData()
+        
+        # --- Prepare to start Routine "stopEye" ---
+        # create an object to store info about Routine stopEye
+        stopEye = data.Routine(
+            name='stopEye',
+            components=[text_3, stopResp],
+        )
+        stopEye.status = NOT_STARTED
+        continueRoutine = True
+        # update component parameters for each repeat
+        # create starting attributes for stopResp
+        stopResp.keys = []
+        stopResp.rt = []
+        _stopResp_allKeys = []
+        # store start times for stopEye
+        stopEye.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
+        stopEye.tStart = globalClock.getTime(format='float')
+        stopEye.status = STARTED
+        stopEye.maxDuration = None
+        # keep track of which components have finished
+        stopEyeComponents = stopEye.components
+        for thisComponent in stopEye.components:
+            thisComponent.tStart = None
+            thisComponent.tStop = None
+            thisComponent.tStartRefresh = None
+            thisComponent.tStopRefresh = None
+            if hasattr(thisComponent, 'status'):
+                thisComponent.status = NOT_STARTED
+        # reset timers
+        t = 0
+        _timeToFirstFrame = win.getFutureFlipTime(clock="now")
+        frameN = -1
+        
+        # --- Run Routine "stopEye" ---
+        # if trial has changed, end Routine now
+        if isinstance(breakLoop, data.TrialHandler2) and thisBreakLoop.thisN != breakLoop.thisTrial.thisN:
+            continueRoutine = False
+        stopEye.forceEnded = routineForceEnded = not continueRoutine
+        while continueRoutine:
+            # get current time
+            t = routineTimer.getTime()
+            tThisFlip = win.getFutureFlipTime(clock=routineTimer)
+            tThisFlipGlobal = win.getFutureFlipTime(clock=None)
+            frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
+            # update/draw components on each frame
+            
+            # *text_3* updates
+            
+            # if text_3 is starting this frame...
+            if text_3.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+                # keep track of start time/frame for later
+                text_3.frameNStart = frameN  # exact frame index
+                text_3.tStart = t  # local t and not account for scr refresh
+                text_3.tStartRefresh = tThisFlipGlobal  # on global time
+                win.timeOnFlip(text_3, 'tStartRefresh')  # time at next scr refresh
+                # add timestamp to datafile
+                thisExp.timestampOnFlip(win, 'text_3.started')
+                # update status
+                text_3.status = STARTED
+                text_3.setAutoDraw(True)
+            
+            # if text_3 is active this frame...
+            if text_3.status == STARTED:
+                # update params
+                pass
+            
+            # *stopResp* updates
+            waitOnFlip = False
+            
+            # if stopResp is starting this frame...
+            if stopResp.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+                # keep track of start time/frame for later
+                stopResp.frameNStart = frameN  # exact frame index
+                stopResp.tStart = t  # local t and not account for scr refresh
+                stopResp.tStartRefresh = tThisFlipGlobal  # on global time
+                win.timeOnFlip(stopResp, 'tStartRefresh')  # time at next scr refresh
+                # add timestamp to datafile
+                thisExp.timestampOnFlip(win, 'stopResp.started')
+                # update status
+                stopResp.status = STARTED
+                # keyboard checking is just starting
+                waitOnFlip = True
+                win.callOnFlip(stopResp.clock.reset)  # t=0 on next screen flip
+                win.callOnFlip(stopResp.clearEvents, eventType='keyboard')  # clear events on next screen flip
+            if stopResp.status == STARTED and not waitOnFlip:
+                theseKeys = stopResp.getKeys(keyList=['space'], ignoreKeys=["escape"], waitRelease=False)
+                _stopResp_allKeys.extend(theseKeys)
+                if len(_stopResp_allKeys):
+                    stopResp.keys = _stopResp_allKeys[-1].name  # just the last key pressed
+                    stopResp.rt = _stopResp_allKeys[-1].rt
+                    stopResp.duration = _stopResp_allKeys[-1].duration
+                    # a response ends the routine
+                    continueRoutine = False
+            
+            # check for quit (typically the Esc key)
+            if defaultKeyboard.getKeys(keyList=["escape"]):
+                thisExp.status = FINISHED
+            if thisExp.status == FINISHED or endExpNow:
+                endExperiment(thisExp, win=win)
+                return
+            # pause experiment here if requested
+            if thisExp.status == PAUSED:
+                pauseExperiment(
+                    thisExp=thisExp, 
+                    win=win, 
+                    timers=[routineTimer], 
+                    playbackComponents=[]
+                )
+                # skip the frame we paused on
+                continue
+            
+            # check if all components have finished
+            if not continueRoutine:  # a component has requested a forced-end of Routine
+                stopEye.forceEnded = routineForceEnded = True
+                break
+            continueRoutine = False  # will revert to True if at least one component still running
+            for thisComponent in stopEye.components:
+                if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
+                    continueRoutine = True
+                    break  # at least one component has not yet finished
+            
+            # refresh the screen
+            if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
+                win.flip()
+        
+        # --- Ending Routine "stopEye" ---
+        for thisComponent in stopEye.components:
+            if hasattr(thisComponent, "setAutoDraw"):
+                thisComponent.setAutoDraw(False)
+        # store stop times for stopEye
+        stopEye.tStop = globalClock.getTime(format='float')
+        stopEye.tStopRefresh = tThisFlipGlobal
+        # check responses
+        if stopResp.keys in ['', [], None]:  # No response was made
+            stopResp.keys = None
+        breakLoop.addData('stopResp.keys',stopResp.keys)
+        if stopResp.keys != None:  # we had a response
+            breakLoop.addData('stopResp.rt', stopResp.rt)
+            breakLoop.addData('stopResp.duration', stopResp.duration)
+        # the Routine "stopEye" was not non-slip safe, so reset the non-slip timer
+        routineTimer.reset()
     # completed 6.0 repeats of 'breakLoop'
     
-    
-    # --- Prepare to start Routine "stopEye" ---
-    # create an object to store info about Routine stopEye
-    stopEye = data.Routine(
-        name='stopEye',
-        components=[text_3, stopResp],
-    )
-    stopEye.status = NOT_STARTED
-    continueRoutine = True
-    # update component parameters for each repeat
-    # create starting attributes for stopResp
-    stopResp.keys = []
-    stopResp.rt = []
-    _stopResp_allKeys = []
-    # store start times for stopEye
-    stopEye.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
-    stopEye.tStart = globalClock.getTime(format='float')
-    stopEye.status = STARTED
-    stopEye.maxDuration = None
-    # keep track of which components have finished
-    stopEyeComponents = stopEye.components
-    for thisComponent in stopEye.components:
-        thisComponent.tStart = None
-        thisComponent.tStop = None
-        thisComponent.tStartRefresh = None
-        thisComponent.tStopRefresh = None
-        if hasattr(thisComponent, 'status'):
-            thisComponent.status = NOT_STARTED
-    # reset timers
-    t = 0
-    _timeToFirstFrame = win.getFutureFlipTime(clock="now")
-    frameN = -1
-    
-    # --- Run Routine "stopEye" ---
-    stopEye.forceEnded = routineForceEnded = not continueRoutine
-    while continueRoutine:
-        # get current time
-        t = routineTimer.getTime()
-        tThisFlip = win.getFutureFlipTime(clock=routineTimer)
-        tThisFlipGlobal = win.getFutureFlipTime(clock=None)
-        frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
-        # update/draw components on each frame
-        
-        # *text_3* updates
-        
-        # if text_3 is starting this frame...
-        if text_3.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
-            # keep track of start time/frame for later
-            text_3.frameNStart = frameN  # exact frame index
-            text_3.tStart = t  # local t and not account for scr refresh
-            text_3.tStartRefresh = tThisFlipGlobal  # on global time
-            win.timeOnFlip(text_3, 'tStartRefresh')  # time at next scr refresh
-            # add timestamp to datafile
-            thisExp.timestampOnFlip(win, 'text_3.started')
-            # update status
-            text_3.status = STARTED
-            text_3.setAutoDraw(True)
-        
-        # if text_3 is active this frame...
-        if text_3.status == STARTED:
-            # update params
-            pass
-        
-        # *stopResp* updates
-        waitOnFlip = False
-        
-        # if stopResp is starting this frame...
-        if stopResp.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
-            # keep track of start time/frame for later
-            stopResp.frameNStart = frameN  # exact frame index
-            stopResp.tStart = t  # local t and not account for scr refresh
-            stopResp.tStartRefresh = tThisFlipGlobal  # on global time
-            win.timeOnFlip(stopResp, 'tStartRefresh')  # time at next scr refresh
-            # add timestamp to datafile
-            thisExp.timestampOnFlip(win, 'stopResp.started')
-            # update status
-            stopResp.status = STARTED
-            # keyboard checking is just starting
-            waitOnFlip = True
-            win.callOnFlip(stopResp.clock.reset)  # t=0 on next screen flip
-            win.callOnFlip(stopResp.clearEvents, eventType='keyboard')  # clear events on next screen flip
-        if stopResp.status == STARTED and not waitOnFlip:
-            theseKeys = stopResp.getKeys(keyList=['space'], ignoreKeys=["escape"], waitRelease=False)
-            _stopResp_allKeys.extend(theseKeys)
-            if len(_stopResp_allKeys):
-                stopResp.keys = _stopResp_allKeys[-1].name  # just the last key pressed
-                stopResp.rt = _stopResp_allKeys[-1].rt
-                stopResp.duration = _stopResp_allKeys[-1].duration
-                # a response ends the routine
-                continueRoutine = False
-        
-        # check for quit (typically the Esc key)
-        if defaultKeyboard.getKeys(keyList=["escape"]):
-            thisExp.status = FINISHED
-        if thisExp.status == FINISHED or endExpNow:
-            endExperiment(thisExp, win=win)
-            return
-        # pause experiment here if requested
-        if thisExp.status == PAUSED:
-            pauseExperiment(
-                thisExp=thisExp, 
-                win=win, 
-                timers=[routineTimer], 
-                playbackComponents=[]
-            )
-            # skip the frame we paused on
-            continue
-        
-        # check if all components have finished
-        if not continueRoutine:  # a component has requested a forced-end of Routine
-            stopEye.forceEnded = routineForceEnded = True
-            break
-        continueRoutine = False  # will revert to True if at least one component still running
-        for thisComponent in stopEye.components:
-            if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
-                continueRoutine = True
-                break  # at least one component has not yet finished
-        
-        # refresh the screen
-        if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
-            win.flip()
-    
-    # --- Ending Routine "stopEye" ---
-    for thisComponent in stopEye.components:
-        if hasattr(thisComponent, "setAutoDraw"):
-            thisComponent.setAutoDraw(False)
-    # store stop times for stopEye
-    stopEye.tStop = globalClock.getTime(format='float')
-    stopEye.tStopRefresh = tThisFlipGlobal
-    # check responses
-    if stopResp.keys in ['', [], None]:  # No response was made
-        stopResp.keys = None
-    thisExp.addData('stopResp.keys',stopResp.keys)
-    if stopResp.keys != None:  # we had a response
-        thisExp.addData('stopResp.rt', stopResp.rt)
-        thisExp.addData('stopResp.duration', stopResp.duration)
-    thisExp.nextEntry()
-    # the Routine "stopEye" was not non-slip safe, so reset the non-slip timer
-    routineTimer.reset()
     
     # --- Prepare to start Routine "complete" ---
     # create an object to store info about Routine complete

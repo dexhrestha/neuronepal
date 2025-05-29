@@ -1056,6 +1056,56 @@
         <Param val="True" valType="bool" updates="constant" name="syncScreenRefresh"/>
       </KeyboardComponent>
     </Routine>
+    <Routine name="startRecord">
+      <RoutineSettingsComponent name="startRecord" plugin="None">
+        <Param val="none" valType="str" updates="None" name="backgroundFit"/>
+        <Param val="" valType="str" updates="None" name="backgroundImg"/>
+        <Param val="$[0,0,0]" valType="color" updates="None" name="color"/>
+        <Param val="rgb" valType="str" updates="None" name="colorSpace"/>
+        <Param val="" valType="str" updates="constant" name="desc"/>
+        <Param val="False" valType="bool" updates="None" name="disabled"/>
+        <Param val="" valType="code" updates="None" name="durationEstim"/>
+        <Param val="False" valType="code" updates="None" name="forceNonSlip"/>
+        <Param val="startRecord" valType="code" updates="None" name="name"/>
+        <Param val="True" valType="bool" updates="None" name="saveStartStop"/>
+        <Param val="" valType="code" updates="constant" name="skipIf"/>
+        <Param val="duration (s)" valType="str" updates="None" name="stopType"/>
+        <Param val="" valType="code" updates="constant" name="stopVal"/>
+        <Param val="False" valType="bool" updates="None" name="useWindowParams"/>
+      </RoutineSettingsComponent>
+      <CameraSetup name="CameraSetup2" plugin="psychopy-eyelink">
+        <Param val="win.color" valType="str" updates="None" name="backgroundColor"/>
+        <Param val="'qbeep.wav','type.wav','error.wav'" valType="str" updates="None" name="calibrationFilenames"/>
+        <Param val="defaults" valType="str" updates="constant" name="calibrationSounds"/>
+        <Param val="HV9" valType="str" updates="constant" name="calibrationType"/>
+        <Param val="False" valType="bool" updates="None" name="disabled"/>
+        <Param val="" valType="code" updates="None" name="durationEstim"/>
+        <Param val="(1,1,1)" valType="str" updates="None" name="foregroundColor"/>
+        <Param val="CameraSetup2" valType="code" updates="None" name="name"/>
+        <Param val="True" valType="bool" updates="None" name="saveStartStop"/>
+        <Param val="" valType="code" updates="None" name="startEstim"/>
+        <Param val="time (s)" valType="str" updates="None" name="startType"/>
+        <Param val="0.0" valType="code" updates="None" name="startVal"/>
+        <Param val="duration (s)" valType="str" updates="None" name="stopType"/>
+        <Param val="0.001" valType="code" updates="constant" name="stopVal"/>
+        <Param val="False" valType="bool" updates="None" name="syncScreenRefresh"/>
+        <Param val="" valType="str" updates="None" name="targetFilename"/>
+        <Param val="24" valType="str" updates="None" name="targetSize"/>
+        <Param val="circle" valType="str" updates="constant" name="targetType"/>
+      </CameraSetup>
+      <StartRecording name="StartRecord2" plugin="psychopy-eyelink">
+        <Param val="False" valType="bool" updates="None" name="disabled"/>
+        <Param val="" valType="code" updates="None" name="durationEstim"/>
+        <Param val="StartRecord2" valType="code" updates="None" name="name"/>
+        <Param val="True" valType="bool" updates="None" name="saveStartStop"/>
+        <Param val="" valType="code" updates="None" name="startEstim"/>
+        <Param val="time (s)" valType="str" updates="None" name="startType"/>
+        <Param val="0.0" valType="code" updates="None" name="startVal"/>
+        <Param val="duration (s)" valType="str" updates="None" name="stopType"/>
+        <Param val="0.001" valType="code" updates="constant" name="stopVal"/>
+        <Param val="False" valType="bool" updates="None" name="syncScreenRefresh"/>
+      </StartRecording>
+    </Routine>
   </Routines>
   <Flow>
     <Routine name="welcome"/>
@@ -1101,6 +1151,7 @@
     <Routine name="reset"/>
     <LoopTerminator name="trials"/>
     <LoopTerminator name="blockTrials"/>
+    <Routine name="stopEye"/>
     <LoopInitiator loopType="TrialHandler" name="breakLoop">
       <Param name="Selected rows" updates="None" val="" valType="str"/>
       <Param name="conditions" updates="None" val="None" valType="str"/>
@@ -1113,6 +1164,7 @@
       <Param name="random seed" updates="None" val="" valType="code"/>
     </LoopInitiator>
     <Routine name="breakRoutine"/>
+    <Routine name="startRecord"/>
     <LoopInitiator loopType="TrialHandler" name="blockTrials2">
       <Param name="Selected rows" updates="None" val="" valType="str"/>
       <Param name="conditions" updates="None" val="None" valType="str"/>
@@ -1153,8 +1205,8 @@
     <Routine name="reset"/>
     <LoopTerminator name="trials2"/>
     <LoopTerminator name="blockTrials2"/>
-    <LoopTerminator name="breakLoop"/>
     <Routine name="stopEye"/>
+    <LoopTerminator name="breakLoop"/>
     <Routine name="complete"/>
   </Flow>
 </PsychoPy2experiment>
