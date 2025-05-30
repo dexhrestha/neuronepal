@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2024.2.4),
-    on Thu May 29 18:14:31 2025
+    on Thu May 29 20:43:19 2025
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -1106,8 +1106,8 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         continueRoutine = True
         # update component parameters for each repeat
         # Run 'Begin Routine' code from blockSetup_2
-        visualMode= visualModeOptions[blockTrials.thisN]
-        speed = speedOptions[blockTrials.thisN]
+        visualMode= visualModeOptions[blockTrials.thisN-1]
+        speed = speedOptions[blockTrials.thisN-1]
         # store start times for blockSetup
         blockSetup.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
         blockSetup.tStart = globalClock.getTime(format='float')
@@ -2440,8 +2440,8 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             continueRoutine = True
             # update component parameters for each repeat
             # Run 'Begin Routine' code from blockSetup_2
-            visualMode= visualModeOptions[blockTrials.thisN]
-            speed = speedOptions[blockTrials.thisN]
+            visualMode= visualModeOptions[blockTrials.thisN-1]
+            speed = speedOptions[blockTrials.thisN-1]
             # store start times for blockSetup
             blockSetup.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
             blockSetup.tStart = globalClock.getTime(format='float')
