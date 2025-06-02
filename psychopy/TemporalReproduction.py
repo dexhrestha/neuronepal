@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2024.2.4),
-    on Fri May 30 19:00:20 2025
+    on Fri May 30 19:35:14 2025
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -264,6 +264,12 @@ def setupDevices(expInfo, thisExp, win):
         deviceManager.addDevice(
             deviceClass='keyboard', deviceName='defaultKeyboard', backend='iohub'
         )
+    if deviceManager.getDevice('keyWelcome') is None:
+        # initialise keyWelcome
+        keyWelcome = deviceManager.addDevice(
+            deviceClass='keyboard',
+            deviceName='keyWelcome',
+        )
     if deviceManager.getDevice('key_resp') is None:
         # initialise key_resp
         key_resp = deviceManager.addDevice(
@@ -401,6 +407,16 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     
     # Start Code - component code to be run after the window creation
     
+    # --- Initialize components for Routine "welcomeRoutine" ---
+    welcomeText = visual.TextStim(win=win, name='welcomeText',
+        text='Temporal Reproduction Task\n\nYou will see brief flashes of light in a temporal pattern. Then, you need to press the spacebar to repeat the pattern of flashes.\n\n ',
+        font='Arial',
+        pos=(0, 0), draggable=False, height=0.75, wrapWidth=25.0, ori=0.0, 
+        color='white', colorSpace='rgb', opacity=None, 
+        languageStyle='LTR',
+        depth=0.0);
+    keyWelcome = keyboard.Keyboard(deviceName='keyWelcome')
+    
     # --- Initialize components for Routine "expSetup" ---
     # Run 'Begin Experiment' code from expSetup_env
     # Environment variables
@@ -428,42 +444,42 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     # --- Initialize components for Routine "trial" ---
     stimulusWhite1 = visual.Rect(
         win=win, name='stimulusWhite1',
-        width=(25, 25)[0], height=(25, 25)[1],
+        width=(50, 50)[0], height=(50, 50)[1],
         ori=0.0, pos=(0, 0), draggable=False, anchor='center',
         lineWidth=1.0,
         colorSpace='rgb', lineColor='white', fillColor='white',
         opacity=None, depth=0.0, interpolate=True)
     stimulusWhite2 = visual.Rect(
         win=win, name='stimulusWhite2',
-        width=(25, 25)[0], height=(25, 25)[1],
+        width=(50, 50)[0], height=(50, 50)[1],
         ori=0.0, pos=(0, 0), draggable=False, anchor='center',
         lineWidth=1.0,
         colorSpace='rgb', lineColor='white', fillColor='white',
         opacity=None, depth=-1.0, interpolate=True)
     stimulusWhite3 = visual.Rect(
         win=win, name='stimulusWhite3',
-        width=(25, 25)[0], height=(25, 25)[1],
+        width=(50, 50)[0], height=(50, 50)[1],
         ori=0.0, pos=(0, 0), draggable=False, anchor='center',
         lineWidth=1.0,
         colorSpace='rgb', lineColor='white', fillColor='white',
         opacity=None, depth=-2.0, interpolate=True)
     stimulusWhite4 = visual.Rect(
         win=win, name='stimulusWhite4',
-        width=(25, 25)[0], height=(25, 25)[1],
+        width=(50, 50)[0], height=(50, 50)[1],
         ori=0.0, pos=(0, 0), draggable=False, anchor='center',
         lineWidth=1.0,
         colorSpace='rgb', lineColor='white', fillColor='white',
         opacity=None, depth=-3.0, interpolate=True)
     stimulusWhite5 = visual.Rect(
         win=win, name='stimulusWhite5',
-        width=(25, 25)[0], height=(25, 25)[1],
+        width=(50, 50)[0], height=(50, 50)[1],
         ori=0.0, pos=(0, 0), draggable=False, anchor='center',
         lineWidth=1.0,
         colorSpace='rgb', lineColor='white', fillColor='white',
         opacity=None, depth=-4.0, interpolate=True)
     stimulusWhite6 = visual.Rect(
         win=win, name='stimulusWhite6',
-        width=(25, 25)[0], height=(25, 25)[1],
+        width=(50, 50)[0], height=(50, 50)[1],
         ori=0.0, pos=(0, 0), draggable=False, anchor='center',
         lineWidth=1.0,
         colorSpace='rgb', lineColor='white', fillColor='white',
@@ -476,7 +492,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         colorSpace='rgb', lineColor=[1.0000, -1.0000, -1.0000], fillColor=[1.0000, -1.0000, -1.0000],
         opacity=None, depth=-6.0, interpolate=True)
     statusText = visual.TextStim(win=win, name='statusText',
-        text='Time: ',
+        text='Press spacebar and reproduce the pattern.',
         font='Arial',
         pos=(0, -0.8), draggable=False, height=0.6, wrapWidth=None, ori=0.0, 
         color=[-1.0000, -1.0000, 1.0000], colorSpace='rgb', opacity=None, 
@@ -489,14 +505,14 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     respKeyRelease = keyboard.Keyboard(deviceName='respKeyRelease')
     testPhase = visual.Rect(
         win=win, name='testPhase',
-        width=(25, 25)[0], height=(25, 25)[1],
+        width=(50, 50)[0], height=(50, 50)[1],
         ori=0.0, pos=(0, 0), draggable=False, anchor='center',
         lineWidth=1.0,
         colorSpace='rgb', lineColor='white', fillColor=[-1.0000, -1.0000, -1.0000],
         opacity=None, depth=-2.0, interpolate=True)
     responseGreen = visual.Rect(
         win=win, name='responseGreen',
-        width=(25, 25)[0], height=(25, 25)[1],
+        width=(50, 50)[0], height=(50, 50)[1],
         ori=0.0, pos=(0, 0), draggable=False, anchor='center',
         lineWidth=1.0,
         colorSpace='rgb', lineColor='white', fillColor=[-1.0000, 1.0000, -1.0000],
@@ -664,6 +680,140 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     expInfo['expStart'] = data.getDateStr(
         format='%Y-%m-%d %Hh%M.%S.%f %z', fractionalSecondDigits=6
     )
+    
+    # --- Prepare to start Routine "welcomeRoutine" ---
+    # create an object to store info about Routine welcomeRoutine
+    welcomeRoutine = data.Routine(
+        name='welcomeRoutine',
+        components=[welcomeText, keyWelcome],
+    )
+    welcomeRoutine.status = NOT_STARTED
+    continueRoutine = True
+    # update component parameters for each repeat
+    # create starting attributes for keyWelcome
+    keyWelcome.keys = []
+    keyWelcome.rt = []
+    _keyWelcome_allKeys = []
+    # store start times for welcomeRoutine
+    welcomeRoutine.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
+    welcomeRoutine.tStart = globalClock.getTime(format='float')
+    welcomeRoutine.status = STARTED
+    thisExp.addData('welcomeRoutine.started', welcomeRoutine.tStart)
+    welcomeRoutine.maxDuration = None
+    # keep track of which components have finished
+    welcomeRoutineComponents = welcomeRoutine.components
+    for thisComponent in welcomeRoutine.components:
+        thisComponent.tStart = None
+        thisComponent.tStop = None
+        thisComponent.tStartRefresh = None
+        thisComponent.tStopRefresh = None
+        if hasattr(thisComponent, 'status'):
+            thisComponent.status = NOT_STARTED
+    # reset timers
+    t = 0
+    _timeToFirstFrame = win.getFutureFlipTime(clock="now")
+    frameN = -1
+    
+    # --- Run Routine "welcomeRoutine" ---
+    welcomeRoutine.forceEnded = routineForceEnded = not continueRoutine
+    while continueRoutine:
+        # get current time
+        t = routineTimer.getTime()
+        tThisFlip = win.getFutureFlipTime(clock=routineTimer)
+        tThisFlipGlobal = win.getFutureFlipTime(clock=None)
+        frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
+        # update/draw components on each frame
+        
+        # *welcomeText* updates
+        
+        # if welcomeText is starting this frame...
+        if welcomeText.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+            # keep track of start time/frame for later
+            welcomeText.frameNStart = frameN  # exact frame index
+            welcomeText.tStart = t  # local t and not account for scr refresh
+            welcomeText.tStartRefresh = tThisFlipGlobal  # on global time
+            win.timeOnFlip(welcomeText, 'tStartRefresh')  # time at next scr refresh
+            # add timestamp to datafile
+            thisExp.timestampOnFlip(win, 'welcomeText.started')
+            # update status
+            welcomeText.status = STARTED
+            welcomeText.setAutoDraw(True)
+        
+        # if welcomeText is active this frame...
+        if welcomeText.status == STARTED:
+            # update params
+            pass
+        
+        # *keyWelcome* updates
+        waitOnFlip = False
+        
+        # if keyWelcome is starting this frame...
+        if keyWelcome.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+            # keep track of start time/frame for later
+            keyWelcome.frameNStart = frameN  # exact frame index
+            keyWelcome.tStart = t  # local t and not account for scr refresh
+            keyWelcome.tStartRefresh = tThisFlipGlobal  # on global time
+            win.timeOnFlip(keyWelcome, 'tStartRefresh')  # time at next scr refresh
+            # add timestamp to datafile
+            thisExp.timestampOnFlip(win, 'keyWelcome.started')
+            # update status
+            keyWelcome.status = STARTED
+            # keyboard checking is just starting
+            waitOnFlip = True
+            win.callOnFlip(keyWelcome.clock.reset)  # t=0 on next screen flip
+            win.callOnFlip(keyWelcome.clearEvents, eventType='keyboard')  # clear events on next screen flip
+        if keyWelcome.status == STARTED and not waitOnFlip:
+            theseKeys = keyWelcome.getKeys(keyList=['space'], ignoreKeys=["escape"], waitRelease=False)
+            _keyWelcome_allKeys.extend(theseKeys)
+            if len(_keyWelcome_allKeys):
+                keyWelcome.keys = _keyWelcome_allKeys[-1].name  # just the last key pressed
+                keyWelcome.rt = _keyWelcome_allKeys[-1].rt
+                keyWelcome.duration = _keyWelcome_allKeys[-1].duration
+                # a response ends the routine
+                continueRoutine = False
+        
+        # check for quit (typically the Esc key)
+        if defaultKeyboard.getKeys(keyList=["escape"]):
+            thisExp.status = FINISHED
+        if thisExp.status == FINISHED or endExpNow:
+            endExperiment(thisExp, win=win)
+            return
+        # pause experiment here if requested
+        if thisExp.status == PAUSED:
+            pauseExperiment(
+                thisExp=thisExp, 
+                win=win, 
+                timers=[routineTimer], 
+                playbackComponents=[]
+            )
+            # skip the frame we paused on
+            continue
+        
+        # check if all components have finished
+        if not continueRoutine:  # a component has requested a forced-end of Routine
+            welcomeRoutine.forceEnded = routineForceEnded = True
+            break
+        continueRoutine = False  # will revert to True if at least one component still running
+        for thisComponent in welcomeRoutine.components:
+            if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
+                continueRoutine = True
+                break  # at least one component has not yet finished
+        
+        # refresh the screen
+        if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
+            win.flip()
+    
+    # --- Ending Routine "welcomeRoutine" ---
+    for thisComponent in welcomeRoutine.components:
+        if hasattr(thisComponent, "setAutoDraw"):
+            thisComponent.setAutoDraw(False)
+    # store stop times for welcomeRoutine
+    welcomeRoutine.tStop = globalClock.getTime(format='float')
+    welcomeRoutine.tStopRefresh = tThisFlipGlobal
+    thisExp.addData('welcomeRoutine.stopped', welcomeRoutine.tStop)
+    thisExp.nextEntry()
+    # the Routine "welcomeRoutine" was not non-slip safe, so reset the non-slip timer
+    routineTimer.reset()
     
     # --- Prepare to start Routine "expSetup" ---
     # create an object to store info about Routine expSetup
@@ -881,7 +1031,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         # set up handler to look after randomisation of conditions etc
         trialBlock = data.TrialHandler2(
             name='trialBlock',
-            nReps=4.0, 
+            nReps=2.0, 
             method='random', 
             extraInfo=expInfo, 
             originPath=-1, 
@@ -912,7 +1062,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             # set up handler to look after randomisation of conditions etc
             trials = data.TrialHandler2(
                 name='trials',
-                nReps=15.0, 
+                nReps=2.0, 
                 method='random', 
                 extraInfo=expInfo, 
                 originPath=-1, 
@@ -1248,7 +1398,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     6 : {startTimes[5]*speed:.2f},{stimulusWhite6.tStart:.2f}"""
                     except:
                         statusText.text = ''
-                    #statusText.text = ''
+                    statusText.text = 'Press spacebar and reproduce the pattern.'
                     
                     # *key_resp* updates
                     waitOnFlip = False
@@ -1399,7 +1549,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     # if respKeyPress is stopping this frame...
                     if respKeyPress.status == STARTED:
                         # is it time to stop? (based on global clock, using actual start)
-                        if tThisFlipGlobal > respKeyPress.tStartRefresh + startTimes[5]*speed+0.025+3-frameTolerance:
+                        if tThisFlipGlobal > respKeyPress.tStartRefresh + startTimes[5]+0.025+2-frameTolerance:
                             # keep track of stop time/frame for later
                             respKeyPress.tStop = t  # not accounting for scr refresh
                             respKeyPress.tStopRefresh = tThisFlipGlobal  # on global time
@@ -1439,7 +1589,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     # if respKeyRelease is stopping this frame...
                     if respKeyRelease.status == STARTED:
                         # is it time to stop? (based on global clock, using actual start)
-                        if tThisFlipGlobal > respKeyRelease.tStartRefresh + startTimes[5]*speed+0.025+3-frameTolerance:
+                        if tThisFlipGlobal > respKeyRelease.tStartRefresh + startTimes[5]+0.025+2-frameTolerance:
                             # keep track of stop time/frame for later
                             respKeyRelease.tStop = t  # not accounting for scr refresh
                             respKeyRelease.tStopRefresh = tThisFlipGlobal  # on global time
@@ -1499,6 +1649,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     else:
                         responseGreen.opacity = 0 
                         win.flip()
+                        
                     if len(respKeyRelease.keys) == 5:
                         continueRoutine = False
                     # Small delay to prevent maxing CPU
@@ -1527,7 +1678,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     # if responseGreen is stopping this frame...
                     if responseGreen.status == STARTED:
                         # is it time to stop? (based on global clock, using actual start)
-                        if tThisFlipGlobal > responseGreen.tStartRefresh + startTimes[5]+2-frameTolerance:
+                        if tThisFlipGlobal > responseGreen.tStartRefresh + startTimes[5]+0.025+2-frameTolerance:
                             # keep track of stop time/frame for later
                             responseGreen.tStop = t  # not accounting for scr refresh
                             responseGreen.tStopRefresh = tThisFlipGlobal  # on global time
@@ -1561,7 +1712,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     # if fixationRedTest is stopping this frame...
                     if fixationRedTest.status == STARTED:
                         # is it time to stop? (based on global clock, using actual start)
-                        if tThisFlipGlobal > fixationRedTest.tStartRefresh + startTimes[5]+2-frameTolerance:
+                        if tThisFlipGlobal > fixationRedTest.tStartRefresh + startTimes[5]+0.025+2-frameTolerance:
                             # keep track of stop time/frame for later
                             fixationRedTest.tStop = t  # not accounting for scr refresh
                             fixationRedTest.tStopRefresh = tThisFlipGlobal  # on global time
@@ -1664,7 +1815,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     respTimes_orig[i+1] = respTimes[i]
                    
                 corr = np.corrcoef(respTimes_orig, startTimes)[0, 1]
-                corrText.text = f'Score : {corr}'
+                corrText.text = f'Score : {corr:.2f}'
                 
                  
                  
@@ -2097,7 +2248,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     trials.addData('feedbackResp.duration', feedbackResp.duration)
                 # the Routine "feedbackRoutine" was not non-slip safe, so reset the non-slip timer
                 routineTimer.reset()
-            # completed 15.0 repeats of 'trials'
+            # completed 2.0 repeats of 'trials'
             
             
             # --- Prepare to start Routine "breakRoutine" ---
@@ -2244,7 +2395,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             routineTimer.reset()
             thisExp.nextEntry()
             
-        # completed 4.0 repeats of 'trialBlock'
+        # completed 2.0 repeats of 'trialBlock'
         
         if thisSession is not None:
             # if running in a Session with a Liaison client, send data up to now
