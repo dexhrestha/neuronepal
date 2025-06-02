@@ -71,7 +71,7 @@
     <Param val="1000" valType="num" updates="None" name="plPupilRemoteTimeoutMs"/>
     <Param val="False" valType="bool" updates="None" name="plPupillometryOnly"/>
     <Param val="psychopy_iohub_surface" valType="str" updates="None" name="plSurfaceName"/>
-    <Param val="1" valType="code" updates="None" name="runMode"/>
+    <Param val="0" valType="code" updates="None" name="runMode"/>
     <Param val="False" valType="bool" updates="None" name="rush"/>
     <Param val="time" valType="str" updates="None" name="sortColumns"/>
     <Param val="" valType="str" updates="None" name="tbLicenseFile"/>
@@ -235,12 +235,12 @@
         <Param val="" valType="extendedCode" updates="constant" name="Begin JS Routine"/>
         <Param val="## add logic to  add all images on a line&amp;#10;dots.speed = 0&amp;#10;dots.dotLife = -1&amp;#10;closestLMs = sorted(landmarks,key=lambda x:abs(x.pos[0]),reverse=False)&amp;#10;&amp;#10;if visualMode:&amp;#10;    for index,lm  in  enumerate(closestLMs):&amp;#10;        lm.opacity = 1  &amp;#10;else:&amp;#10;    closestLMs[0].opacity = 1&amp;#10;    closestIdx = closestLMs[0].idx&amp;#10;    leftLM = landmarks[closestIdx-1] if closestIdx&gt;0 else landmarks[closestIdx]&amp;#10;    leftLM.opacity = 1&amp;#10;    rightLM = landmarks[closestIdx+1] if closestIdx&lt;6 else landmarks[closestIdx]&amp;#10;    rightLM.opacity = 1&amp;#10;    &amp;#10;    &amp;#10;targetLandmark.opacity = 1&amp;#10;        &amp;#10;targetLandmark.image = f'public/landmarks/images/imageset1/{targetId}.jpg'&amp;#10;&amp;#10;    &amp;#10;if targetReached:&amp;#10;    score += 1&amp;#10;    continueRoutine = False&amp;#10;    " valType="extendedCode" updates="constant" name="Begin Routine"/>
         <Param val="Py" valType="str" updates="None" name="Code Type"/>
-        <Param val="## add logic to  move the image for each frame    &amp;#10;if loopName == &quot;blockTrials&quot;:&amp;#10;    completedTrials  = blockTrials.thisN&amp;#10;elif loopName == &quot;blockTrials_2&quot;:&amp;#10;    completedTrials = blockTrials_2.thisN&amp;#10;&amp;#10;if devMode:    &amp;#10;    statusText = f&quot;Current Time : {str(int(expClock.getTime()))} \n Completed Trials:{completedTrials}/{currentTrialDD} \n Score: {score} \n Speed: {speed} \n Step Size : {dt} \n Visual : {visualMode} &quot; &amp;#10;else:&amp;#10;    statusText = ''&amp;#10;    &amp;#10;timeText.setText(statusText)&amp;#10;    &amp;#10;if  keyRelease.keys == 'left' or keyRelease.keys == 'right':&amp;#10;    targetReached = abs(landmarks[targetId].pos[0])   &lt;= tolerance * landmarkWidth&amp;#10;    dots.dir =  0&amp;#10;    dots.dotLife = -1&amp;#10;    dots.speed = 0&amp;#10;    &amp;#10;if keyPress.keys == 'left' or keyPress.keys  == 'right':&amp;#10;    if not visualMode:&amp;#10;        for lm in  landmarks:&amp;#10;            lm.opacity = 0&amp;#10;            dotsArray[lm.idx].opacity = 0&amp;#10;        targetLandmark.opacity = 0&amp;#10;        &amp;#10;if  keyPress.keys == 'left':&amp;#10;    dots.dir =  180&amp;#10;    for lm in landmarks:&amp;#10;        if  landmarks[-1].pos[0]&lt;-1*edgeLandmarkDistance:&amp;#10;            break&amp;#10;        lm.pos -= (speed*dt,0)&amp;#10;        dotsArray[lm.idx].pos -= (speed*dt,0)&amp;#10;&amp;#10;    if  landmarks[-1].pos[0]&lt;-1*edgeLandmarkDistance:&amp;#10;        dots.speed = 0&amp;#10;        dots.dotLife = -1&amp;#10;    else:&amp;#10;        dots.speed =  speed*dt&amp;#10;        dots.dotLife = dotLife&amp;#10;    &amp;#10;elif  keyPress.keys == 'right':&amp;#10;    dots.dir = 0&amp;#10;    for lm in landmarks:&amp;#10;        if  landmarks[0].pos[0]&gt;edgeLandmarkDistance:&amp;#10;            break&amp;#10;        lm.pos += (speed*dt,0)&amp;#10;        dotsArray[lm.idx].pos += (speed*dt,0)&amp;#10;    if  landmarks[0].pos[0]&gt;edgeLandmarkDistance:&amp;#10;        dots.speed = 0&amp;#10;        dots.dotLife = -1&amp;#10;    else:&amp;#10;        dots.speed =  speed*dt&amp;#10;        dots.dotLife = dotLife&amp;#10;&amp;#10;&amp;#10;&amp;#10;for lm in landmarks:&amp;#10;    dotsArray[lm.idx].opacity = lm.opacity&amp;#10;&amp;#10;&amp;#10; " valType="extendedCode" updates="constant" name="Each Frame"/>
+        <Param val="## add logic to  move the image for each frame    &amp;#10;if loopName == &quot;blockTrials&quot;:&amp;#10;    completedTrials  = blockTrials.thisN&amp;#10;elif loopName == &quot;breakLoop&quot;:&amp;#10;    completedTrials = breakLoop.thisN&amp;#10;&amp;#10;if devMode:    &amp;#10;    statusText = f&quot;Current Time : {str(int(expClock.getTime()))} \n Completed Trials:{completedTrials}/{currentTrialDD} \n Score: {score} \n Speed: {speed} \n Step Size : {dt} \n Visual : {visualMode} &quot; &amp;#10;else:&amp;#10;    statusText = ''&amp;#10;    &amp;#10;timeText.setText(statusText)&amp;#10;    &amp;#10;if  keyRelease.keys == 'left' or keyRelease.keys == 'right':&amp;#10;    targetReached = abs(landmarks[targetId].pos[0])   &lt;= tolerance * landmarkWidth&amp;#10;    dots.dir =  0&amp;#10;    dots.dotLife = -1&amp;#10;    dots.speed = 0&amp;#10;    &amp;#10;if keyPress.keys == 'left' or keyPress.keys  == 'right':&amp;#10;    if not visualMode:&amp;#10;        for lm in  landmarks:&amp;#10;            lm.opacity = 0&amp;#10;            dotsArray[lm.idx].opacity = 0&amp;#10;        targetLandmark.opacity = 0&amp;#10;        &amp;#10;if  keyPress.keys == 'left':&amp;#10;    dots.dir =  180&amp;#10;    for lm in landmarks:&amp;#10;        if  landmarks[-1].pos[0]&lt;-1*edgeLandmarkDistance:&amp;#10;            break&amp;#10;        lm.pos -= (speed*dt,0)&amp;#10;        dotsArray[lm.idx].pos -= (speed*dt,0)&amp;#10;&amp;#10;    if  landmarks[-1].pos[0]&lt;-1*edgeLandmarkDistance:&amp;#10;        dots.speed = 0&amp;#10;        dots.dotLife = -1&amp;#10;    else:&amp;#10;        dots.speed =  speed*dt&amp;#10;        dots.dotLife = dotLife&amp;#10;    &amp;#10;elif  keyPress.keys == 'right':&amp;#10;    dots.dir = 0&amp;#10;    for lm in landmarks:&amp;#10;        if  landmarks[0].pos[0]&gt;edgeLandmarkDistance:&amp;#10;            break&amp;#10;        lm.pos += (speed*dt,0)&amp;#10;        dotsArray[lm.idx].pos += (speed*dt,0)&amp;#10;    if  landmarks[0].pos[0]&gt;edgeLandmarkDistance:&amp;#10;        dots.speed = 0&amp;#10;        dots.dotLife = -1&amp;#10;    else:&amp;#10;        dots.speed =  speed*dt&amp;#10;        dots.dotLife = dotLife&amp;#10;&amp;#10;&amp;#10;&amp;#10;for lm in landmarks:&amp;#10;    dotsArray[lm.idx].opacity = lm.opacity&amp;#10;&amp;#10;&amp;#10; " valType="extendedCode" updates="constant" name="Each Frame"/>
         <Param val="" valType="extendedCode" updates="constant" name="Each JS Frame"/>
         <Param val="" valType="extendedCode" updates="constant" name="End Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="End JS Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="End JS Routine"/>
-        <Param val="## check if start and target is same&amp;#10;&amp;#10;" valType="extendedCode" updates="constant" name="End Routine"/>
+        <Param val="## check if start and target is same&amp;#10;if stopKey.keys == 's':&amp;#10;#    print(&quot;Stopping experiment sending bye signal.&quot;)&amp;#10;    continueRoutine = False&amp;#10;    experimentExpired = True&amp;#10;    if loopName == 'blockTrials':&amp;#10;        responseBlock.finished = True&amp;#10;    elif loopName == 'breakLoop':&amp;#10;        responseBlock2.finished = True&amp;#10;" valType="extendedCode" updates="constant" name="End Routine"/>
         <Param val="False" valType="bool" updates="None" name="disabled"/>
         <Param val="move_images" valType="code" updates="None" name="name"/>
       </CodeComponent>
@@ -685,17 +685,75 @@
         <Param val="" valType="extendedCode" updates="constant" name="Begin Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="Begin JS Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="Begin JS Routine"/>
-        <Param val="#core.wait(0.5)&amp;#10;&amp;#10;for index,lm in enumerate(landmarks):&amp;#10;    lm.opacity = 0&amp;#10;    dotsArray[index].opacity = 0&amp;#10;&amp;#10;eyeRecord = False&amp;#10;&amp;#10;if stopKey.keys == 's':&amp;#10;    print(&quot;Stopping experiment sending bye signal.&quot;)&amp;#10;    continueRoutine = False&amp;#10;    experimentExpired = True&amp;#10;    &amp;#10;if expClock.getTime()&gt;=totalTime:&amp;#10;    print(&quot;Time limit reached. Ending experiment&quot;)&amp;#10;    continueRoutine = False&amp;#10;    experimentExpired = True&amp;#10;    &amp;#10;    &amp;#10;    &amp;#10; " valType="extendedCode" updates="constant" name="Begin Routine"/>
+        <Param val=" &amp;#10;if stopKey.keys == 's':&amp;#10;#    print(&quot;Stopping experiment sending bye signal.&quot;)&amp;#10;    continueRoutine = False&amp;#10;    experimentExpired = True&amp;#10;    &amp;#10;if expClock.getTime()&gt;=totalTime:&amp;#10;#    print(&quot;Time limit reached. Ending experiment&quot;)&amp;#10;    continueRoutine = False&amp;#10;    experimentExpired = True" valType="extendedCode" updates="constant" name="Begin Routine"/>
         <Param val="Py" valType="str" updates="None" name="Code Type"/>
-        <Param val="" valType="extendedCode" updates="constant" name="Each Frame"/>
+        <Param val="&amp;#10;for index,lm in enumerate(landmarks):&amp;#10;    lm.opacity = 1&amp;#10;    dotsArray[index].opacity = 1&amp;#10;&amp;#10;targetLandmark2.image = targetLandmark.image&amp;#10;targetLandmark2.opacity = 1" valType="extendedCode" updates="constant" name="Each Frame"/>
         <Param val="" valType="extendedCode" updates="constant" name="Each JS Frame"/>
         <Param val="" valType="extendedCode" updates="constant" name="End Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="End JS Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="End JS Routine"/>
-        <Param val="&amp;#10;if 'experimentExpired' in globals() and experimentExpired:&amp;#10;    print(&quot;Received experiment expired signal. Bye&quot;)&amp;#10;&amp;#10;    # Try to end the outer loop, whatever it's named&amp;#10;    if loopName == &quot;blockTrials&quot;:&amp;#10;        blockTrials.finished = True&amp;#10;    elif loopName == &quot;breakLoop&quot;:&amp;#10;        trials2.finished = True&amp;#10;        blockTrials2.finished =True &amp;#10;        breakLoop.finished = True&amp;#10;&amp;#10;thisExp.addData('speed',speed)&amp;#10;thisExp.addData('stepSize',dt)&amp;#10;thisExp.addData('speed',speed)&amp;#10;thisExp.addData('startId',startId)&amp;#10;thisExp.addData('targetId',targetId)&amp;#10;thisExp.addData('startLandmarkPos',landmarks[startId].pos)&amp;#10;thisExp.addData('experimentExpired',experimentExpired)&amp;#10;thisExp.addData('visualMode',visualMode)&amp;#10;thisExp.addData('devMode',devMode)&amp;#10;thisExp.addData(f'{loopName}_duration',expClock.getTime())&amp;#10;thisExp.addData('turn',turn)" valType="extendedCode" updates="constant" name="End Routine"/>
+        <Param val="&amp;#10;for index,lm in enumerate(landmarks):&amp;#10;    lm.opacity = 0&amp;#10;    dotsArray[index].opacity = 0&amp;#10;&amp;#10;if 'experimentExpired' in globals() and experimentExpired:&amp;#10;    print(&quot;Received experiment expired signal. Bye&quot;)&amp;#10;&amp;#10;    # Try to end the outer loop, whatever it's named&amp;#10;    if loopName == &quot;blockTrials&quot;:&amp;#10;        continueRoutine =  False&amp;#10;        trials.finished = True&amp;#10;        blockTrials.finished = True&amp;#10;        loopName='breakLoop'&amp;#10;        &amp;#10;    elif loopName == &quot;breakLoop&quot;:&amp;#10;        continueRoutine =  False&amp;#10;        responseBlock2.finished=True&amp;#10;        trials2.finished=True&amp;#10;        blockTrials2.finished=True&amp;#10;        breakLoop.finished = True&amp;#10;    &amp;#10;    lastLoop.finished = True&amp;#10;&amp;#10;thisExp.addData('speed',speed)&amp;#10;thisExp.addData('stepSize',dt)&amp;#10;thisExp.addData('speed',speed)&amp;#10;thisExp.addData('startId',startId)&amp;#10;thisExp.addData('targetId',targetId)&amp;#10;thisExp.addData('startLandmarkPos',landmarks[startId].pos)&amp;#10;thisExp.addData('experimentExpired',experimentExpired)&amp;#10;thisExp.addData('visualMode',visualMode)&amp;#10;thisExp.addData('devMode',devMode)&amp;#10;thisExp.addData(f'{loopName}_duration',expClock.getTime())&amp;#10;thisExp.addData('turn',turn)" valType="extendedCode" updates="constant" name="End Routine"/>
         <Param val="False" valType="bool" updates="None" name="disabled"/>
         <Param val="resetCode" valType="code" updates="None" name="name"/>
       </CodeComponent>
+      <ImageComponent name="targetLandmark2" plugin="None">
+        <Param val="center" valType="str" updates="constant" name="anchor"/>
+        <Param val="$[1,1,1]" valType="color" updates="constant" name="color"/>
+        <Param val="rgb" valType="str" updates="constant" name="colorSpace"/>
+        <Param val="1" valType="num" updates="constant" name="contrast"/>
+        <Param val="False" valType="bool" updates="None" name="disabled"/>
+        <Param val="False" valType="code" updates="constant" name="draggable"/>
+        <Param val="" valType="code" updates="None" name="durationEstim"/>
+        <Param val="False" valType="bool" updates="constant" name="flipHoriz"/>
+        <Param val="False" valType="bool" updates="constant" name="flipVert"/>
+        <Param val="public/landmarks/images/imageset1/1.jpg" valType="file" updates="set every repeat" name="image"/>
+        <Param val="linear" valType="str" updates="constant" name="interpolate"/>
+        <Param val="" valType="str" updates="constant" name="mask"/>
+        <Param val="targetLandmark2" valType="code" updates="None" name="name"/>
+        <Param val="" valType="num" updates="constant" name="opacity"/>
+        <Param val="0" valType="num" updates="constant" name="ori"/>
+        <Param val="(0, targetLandmarkY)" valType="list" updates="constant" name="pos"/>
+        <Param val="True" valType="bool" updates="None" name="saveStartStop"/>
+        <Param val="(landmarkWidth, landmarkHeight)" valType="list" updates="constant" name="size"/>
+        <Param val="" valType="code" updates="None" name="startEstim"/>
+        <Param val="time (s)" valType="str" updates="None" name="startType"/>
+        <Param val="0.0" valType="code" updates="None" name="startVal"/>
+        <Param val="duration (s)" valType="str" updates="None" name="stopType"/>
+        <Param val="0.5" valType="code" updates="constant" name="stopVal"/>
+        <Param val="True" valType="bool" updates="None" name="syncScreenRefresh"/>
+        <Param val="128" valType="num" updates="constant" name="texture resolution"/>
+        <Param val="deg" valType="str" updates="None" name="units"/>
+        <Param val="" valType="code" updates="None" name="validator"/>
+      </ImageComponent>
+      <PolygonComponent name="fixationRedReset" plugin="None">
+        <Param val="center" valType="str" updates="constant" name="anchor"/>
+        <Param val="rgb" valType="str" updates="constant" name="colorSpace"/>
+        <Param val="1" valType="num" updates="constant" name="contrast"/>
+        <Param val="False" valType="bool" updates="None" name="disabled"/>
+        <Param val="False" valType="code" updates="constant" name="draggable"/>
+        <Param val="" valType="code" updates="None" name="durationEstim"/>
+        <Param val="1.0000, -1.0000, -1.0000" valType="color" updates="constant" name="fillColor"/>
+        <Param val="linear" valType="str" updates="constant" name="interpolate"/>
+        <Param val="1.0000, -1.0000, -1.0000" valType="color" updates="constant" name="lineColor"/>
+        <Param val="1" valType="num" updates="constant" name="lineWidth"/>
+        <Param val="4" valType="int" updates="constant" name="nVertices"/>
+        <Param val="fixationRedReset" valType="code" updates="None" name="name"/>
+        <Param val="" valType="num" updates="constant" name="opacity"/>
+        <Param val="0" valType="num" updates="constant" name="ori"/>
+        <Param val="(0, 0)" valType="list" updates="constant" name="pos"/>
+        <Param val="True" valType="bool" updates="None" name="saveStartStop"/>
+        <Param val="circle" valType="str" updates="None" name="shape"/>
+        <Param val="fixationSize" valType="list" updates="constant" name="size"/>
+        <Param val="" valType="code" updates="None" name="startEstim"/>
+        <Param val="time (s)" valType="str" updates="None" name="startType"/>
+        <Param val="0.0" valType="code" updates="None" name="startVal"/>
+        <Param val="duration (s)" valType="str" updates="None" name="stopType"/>
+        <Param val="0.5" valType="code" updates="constant" name="stopVal"/>
+        <Param val="True" valType="bool" updates="None" name="syncScreenRefresh"/>
+        <Param val="deg" valType="str" updates="None" name="units"/>
+        <Param val="" valType="code" updates="None" name="validator"/>
+        <Param val="" valType="list" updates="constant" name="vertices"/>
+      </PolygonComponent>
     </Routine>
     <Routine name="eyeSetup">
       <RoutineSettingsComponent name="eyeSetup" plugin="None">
@@ -815,7 +873,7 @@
         <Param val="" valType="extendedCode" updates="constant" name="Begin Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="Begin JS Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="Begin JS Routine"/>
-        <Param val="expClock = core.Clock()&amp;#10;&amp;#10;landmarks = []&amp;#10;dotsArray = []&amp;#10;&amp;#10;dots.depth = 0.5&amp;#10;&amp;#10;for i in range(numLandmarks):&amp;#10;    # Create image&amp;#10;    lm = visual.ImageStim(&amp;#10;        win=win,&amp;#10;        name=str(i), units='deg', &amp;#10;        image=f'public/landmarks/images/imageset1/{i}.jpg', mask=None, anchor='center',&amp;#10;        ori=0.0, pos=[0, 0], draggable=False, size=(landmarkWidth, landmarkHeight),&amp;#10;        color=[1,1,1], colorSpace='rgb', opacity=1,&amp;#10;        flipHoriz=False, flipVert=False,&amp;#10;        texRes=128.0, interpolate=True, depth=0.0  # higher depth: behind&amp;#10;    )&amp;#10;    lm.idx = i&amp;#10;    # Create and position dot in front&amp;#10;    dot = visual.Circle(&amp;#10;        win=win,&amp;#10;        radius=0.1,&amp;#10;        fillColor='red',&amp;#10;        lineColor='red',&amp;#10;        units='deg',&amp;#10;        pos=lm.pos,&amp;#10;        opacity=lm.opacity,&amp;#10;        depth=-1.0  # lower depth: in front of image&amp;#10;    )&amp;#10;    &amp;#10;    landmarks.append(lm)&amp;#10;    dotsArray.append(dot)" valType="extendedCode" updates="constant" name="Begin Routine"/>
+        <Param val="expClock = core.Clock()&amp;#10;&amp;#10;landmarks = []&amp;#10;dotsArray = []&amp;#10;&amp;#10;dots.depth = 0.5&amp;#10;loopName = &quot;blockTrials&quot;&amp;#10;for i in range(numLandmarks):&amp;#10;    # Create image&amp;#10;    lm = visual.ImageStim(&amp;#10;        win=win,&amp;#10;        name=str(i), units='deg', &amp;#10;        image=f'public/landmarks/images/imageset1/{i}.jpg', mask=None, anchor='center',&amp;#10;        ori=0.0, pos=[0, 0], draggable=False, size=(landmarkWidth, landmarkHeight),&amp;#10;        color=[1,1,1], colorSpace='rgb', opacity=1,&amp;#10;        flipHoriz=False, flipVert=False,&amp;#10;        texRes=128.0, interpolate=True, depth=0.0  # higher depth: behind&amp;#10;    )&amp;#10;    lm.idx = i&amp;#10;    # Create and position dot in front&amp;#10;    dot = visual.Circle(&amp;#10;        win=win,&amp;#10;        radius=0.1,&amp;#10;        fillColor='red',&amp;#10;        lineColor='red',&amp;#10;        units='deg',&amp;#10;        pos=lm.pos,&amp;#10;        opacity=lm.opacity,&amp;#10;        depth=-1.0  # lower depth: in front of image&amp;#10;    )&amp;#10;    &amp;#10;    landmarks.append(lm)&amp;#10;    dotsArray.append(dot)" valType="extendedCode" updates="constant" name="Begin Routine"/>
         <Param val="Py" valType="str" updates="None" name="Code Type"/>
         <Param val="" valType="extendedCode" updates="constant" name="Each Frame"/>
         <Param val="" valType="extendedCode" updates="constant" name="Each JS Frame"/>
@@ -927,7 +985,7 @@
         <Param val="" valType="extendedCode" updates="constant" name="Begin Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="Begin JS Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="Begin JS Routine"/>
-        <Param val="visualMode= visualModeOptions[blockTrials.thisN-1]&amp;#10;speed = speedOptions[blockTrials.thisN-1]" valType="extendedCode" updates="constant" name="Begin Routine"/>
+        <Param val="visualMode= visualModeOptions[blockTrials.thisN]&amp;#10;speed = speedOptions[blockTrials.thisN]&amp;#10;" valType="extendedCode" updates="constant" name="Begin Routine"/>
         <Param val="Py" valType="str" updates="None" name="Code Type"/>
         <Param val="" valType="extendedCode" updates="constant" name="Each Frame"/>
         <Param val="" valType="extendedCode" updates="constant" name="Each JS Frame"/>
@@ -959,10 +1017,10 @@
       <CodeComponent name="expSetup_env" plugin="None">
         <Param val="# import libraries&amp;#10;import random&amp;#10;from psychopy import event&amp;#10;#defining global variables&amp;#10;&amp;#10;experimentExpired = False" valType="extendedCode" updates="constant" name="Before Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="Before JS Experiment"/>
-        <Param val="&amp;#10;&amp;#10;## Environment variables start&amp;#10;imageset=1 # Image set&amp;#10;landmarkWidth = 5 #Landmark width in degrees&amp;#10;landmarkHeight = 5 #Landmark height in degrees&amp;#10;startLandmarkY = 4# Y position of start Landmark in degrees&amp;#10;targetLandmarkY =  -4# Y position of target Landmark in degrees&amp;#10;interLandmarkDistance = 5# Distance between two neighboring landmarks in degrees&amp;#10;trainingStepSizes = [1,1.5]#speed of landmarks during training in terms of degrees per frame&amp;#10;testingStepSizes = [0.5,0.66,1,1.25,1.5,2]#speed of landmarks during testing in terms of degrees per frame&amp;#10;numLandmarks = 7 # Total number of Landmarks&amp;#10;tolerance = 0.25# Amount of permissible error while matching target and start Landmark&amp;#10;initialTrials = 100# Number of trails as visual for day 2&amp;#10;stopKey = &quot;s&quot; # A key to stop the experiment at anypoint and then save the data&amp;#10;nDots = 100 # Number of white dots in background at any one frame&amp;#10;fixationSize = (0.5,0.5) # Size of fixation dot in degree&amp;#10;#dotRadius = # Size of white dots in background&amp;#10;dotLife = 60 # Number of frames a particular dot will be shown&amp;#10;blockSize = 2 #15 # Block is collection of Trials. Number of trials in a block&amp;#10;#screenHeight = # Height of screen in cm&amp;#10;#objectDistance = # Distance from the eye to the screen in cm&amp;#10;edgeLandmarkDistance = 12.5 # maximum distance of edge landmarks from the center&amp;#10;totalTime = 60*60 # total time before the experiment ends automatically &amp;#10;score = 0&amp;#10;currentTrialDD = 0  &amp;#10;devMode = False&amp;#10;## Environment variables end&amp;#10;&amp;#10;dt = 0.167 # distance between lms is 10deg; this step size is for 10 deg/sec at 60 fps&amp;#10;#defining global variables&amp;#10;targetReached = False&amp;#10;experimentExpired = False&amp;#10;isTrain = True &amp;#10;loopName = &quot;blockTrials&quot;&amp;#10;seed = random.randint(0,9999)&amp;#10;&amp;#10;random.seed(42)&amp;#10;&amp;#10;#Build distance-to-pairs dictionary&amp;#10;all_distance_to_pairs = {&amp;#10;    k: [(i, j) for i in range(numLandmarks) for j in range(numLandmarks)&amp;#10;        if abs(i - j) == k]&amp;#10;    for k in range(1, numLandmarks)&amp;#10;}&amp;#10;&amp;#10;#Select half of the pairs for training&amp;#10;training_pairs = {}&amp;#10;&amp;#10;for k, pairs in all_distance_to_pairs.items():&amp;#10;    shuffled = pairs.copy()&amp;#10;    random.shuffle(shuffled)&amp;#10;    half_n = len(shuffled) // 2&amp;#10;    training_pairs[k] = shuffled[:half_n]&amp;#10;" valType="extendedCode" updates="constant" name="Begin Experiment"/>
+        <Param val="&amp;#10;&amp;#10;## Environment variables start&amp;#10;imageset=1 # Image set&amp;#10;landmarkWidth = 5 #Landmark width in degrees&amp;#10;landmarkHeight = 5 #Landmark height in degrees&amp;#10;startLandmarkY = 4# Y position of start Landmark in degrees&amp;#10;targetLandmarkY =  -4# Y position of target Landmark in degrees&amp;#10;interLandmarkDistance = 5# Distance between two neighboring landmarks in degrees&amp;#10;trainingStepSizes = [1,1.5]#speed of landmarks during training in terms of degrees per frame&amp;#10;testingStepSizes = [0.5,0.66,1,1.25,1.5,2]#speed of landmarks during testing in terms of degrees per frame&amp;#10;numLandmarks = 7 # Total number of Landmarks&amp;#10;tolerance = 0.25# Amount of permissible error while matching target and start Landmark&amp;#10;initialTrials = 100# Number of trails as visual for day 2&amp;#10;stopKey = &quot;s&quot; # A key to stop the experiment at anypoint and then save the data&amp;#10;nDots = 100 # Number of white dots in background at any one frame&amp;#10;fixationSize = (0.5,0.5) # Size of fixation dot in degree&amp;#10;#dotRadius = # Size of white dots in background&amp;#10;dotLife = 60 # Number of frames a particular dot will be shown&amp;#10;blockSize = 2 #15 # Block is collection of Trials. Number of trials in a block&amp;#10;#screenHeight = # Height of screen in cm&amp;#10;#objectDistance = # Distance from the eye to the screen in cm&amp;#10;edgeLandmarkDistance = 12.5 # maximum distance of edge landmarks from the center&amp;#10;totalTime = 1*60 # total time before the experiment ends automatically &amp;#10;score = 0&amp;#10;currentTrialDD = 0  &amp;#10;devMode = True&amp;#10;## Environment variables end&amp;#10;&amp;#10;dt = 0.167 # distance between lms is 10deg; this step size is for 10 deg/sec at 60 fps&amp;#10;#defining global variables&amp;#10;targetReached = False&amp;#10;experimentExpired = False&amp;#10;isTrain = True &amp;#10;loopName = &quot;blockTrials&quot;&amp;#10;seed = random.randint(0,9999)&amp;#10;&amp;#10;random.seed(42)&amp;#10;&amp;#10;#Build distance-to-pairs dictionary&amp;#10;all_distance_to_pairs = {&amp;#10;    k: [(i, j) for i in range(numLandmarks) for j in range(numLandmarks)&amp;#10;        if abs(i - j) == k]&amp;#10;    for k in range(1, numLandmarks)&amp;#10;}&amp;#10;&amp;#10;#Select half of the pairs for training&amp;#10;training_pairs = {}&amp;#10;&amp;#10;for k, pairs in all_distance_to_pairs.items():&amp;#10;    shuffled = pairs.copy()&amp;#10;    random.shuffle(shuffled)&amp;#10;    half_n = len(shuffled) // 2&amp;#10;    training_pairs[k] = shuffled[:half_n]&amp;#10;" valType="extendedCode" updates="constant" name="Begin Experiment"/>
         <Param val="t" valType="extendedCode" updates="constant" name="Begin JS Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="Begin JS Routine"/>
-        <Param val="# generarte a list of distances&amp;#10;allDistances = list(range(1,numLandmarks))&amp;#10;# two list of distances for two block modes&amp;#10;distances1 = [random.choice(allDistances) for _ in range(blockSize*6)]&amp;#10;distances2 =  [random.choice(allDistances) for  _ in range(500)]&amp;#10;# sampling from distance for two block modes&amp;#10;pairs1 = [random.choice(training_pairs[distance]) for distance in distances1]&amp;#10;pairs2 = [random.choice(training_pairs[distance]) for distance in distances2]&amp;#10;# merge the pairs&amp;#10;allPairs = pairs1+pairs2&amp;#10;# randomizing pairs &amp;#10;random.seed(None)&amp;#10;random.shuffle(allPairs)&amp;#10;&amp;#10;# each block within a block mode  has different speed and visual mode&amp;#10;speedOptions = [1,1.5,1.5,1.5,1,1]&amp;#10;#speedOptions = [0.5,0.66,1,1.25,1.5,2]&amp;#10;visualModeOptions = [False,True,False,True,True,False]" valType="extendedCode" updates="constant" name="Begin Routine"/>
+        <Param val="# generarte a list of distances&amp;#10;allDistances = list(range(1,numLandmarks))&amp;#10;# two list of distances for two block modes&amp;#10;distances1 = [random.choice(allDistances) for _ in range(blockSize*6)]&amp;#10;distances2 =  [random.choice(allDistances) for  _ in range(500)]&amp;#10;# sampling from distance for two block modes&amp;#10;pairs1 = [random.choice(training_pairs[distance]) for distance in distances1]&amp;#10;pairs2 = [random.choice(training_pairs[distance]) for distance in distances2]&amp;#10;# merge the pairs&amp;#10;allPairs = pairs1+pairs2&amp;#10;# randomizing pairs &amp;#10;random.seed(None)&amp;#10;random.shuffle(allPairs)&amp;#10;&amp;#10;# each block within a block mode  has different speed and visual mode&amp;#10;speedOptions = [1,1.5,1.5,1.5,1,1]&amp;#10;#speedOptions = [0.5,0.66,1,1.25,1.5,2]&amp;#10;visualModeOptions = [True,False,False,True,True,False]" valType="extendedCode" updates="constant" name="Begin Routine"/>
         <Param val="Py" valType="str" updates="None" name="Code Type"/>
         <Param val="" valType="extendedCode" updates="constant" name="Each Frame"/>
         <Param val="" valType="extendedCode" updates="constant" name="Each JS Frame"/>
@@ -1024,7 +1082,7 @@
         <Param val="" valType="extendedCode" updates="constant" name="Begin Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="Begin JS Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="Begin JS Routine"/>
-        <Param val="visualMode =True&amp;#10;loopName =  &quot;breakLoop&quot;&amp;#10;&amp;#10;random.seed(42)&amp;#10;trainingSpeeds = [s for _ in range(10) for s in testingStepSizes]&amp;#10;random.shuffle(trainingSpeeds)" valType="extendedCode" updates="constant" name="Begin Routine"/>
+        <Param val="visualMode =True&amp;#10;loopName =  &quot;breakLoop&quot;&amp;#10;&amp;#10;random.seed(42)&amp;#10;trainingSpeeds = [s for _ in range(10) for s in testingStepSizes]&amp;#10;random.shuffle(trainingSpeeds)&amp;#10;&amp;#10;&amp;#10;if 'experimentExpired' in globals() and experimentExpired:&amp;#10;    print('dont run breakloop')&amp;#10;    continueRoutine = False    &amp;#10;    breakLoop.finished = True&amp;#10;    break" valType="extendedCode" updates="constant" name="Begin Routine"/>
         <Param val="Py" valType="str" updates="None" name="Code Type"/>
         <Param val="" valType="extendedCode" updates="constant" name="Each Frame"/>
         <Param val="" valType="extendedCode" updates="constant" name="Each JS Frame"/>
@@ -1063,7 +1121,7 @@
         <Param val="$[0,0,0]" valType="color" updates="None" name="color"/>
         <Param val="rgb" valType="str" updates="None" name="colorSpace"/>
         <Param val="" valType="str" updates="constant" name="desc"/>
-        <Param val="False" valType="bool" updates="None" name="disabled"/>
+        <Param val="True" valType="bool" updates="None" name="disabled"/>
         <Param val="" valType="code" updates="None" name="durationEstim"/>
         <Param val="False" valType="code" updates="None" name="forceNonSlip"/>
         <Param val="startRecord" valType="code" updates="None" name="name"/>
@@ -1111,6 +1169,17 @@
     <Routine name="welcome"/>
     <Routine name="expSetup"/>
     <Routine name="eyeSetup"/>
+    <LoopInitiator loopType="TrialHandler" name="lastLoop">
+      <Param name="Selected rows" updates="None" val="" valType="str"/>
+      <Param name="conditions" updates="None" val="None" valType="str"/>
+      <Param name="conditionsFile" updates="None" val="" valType="file"/>
+      <Param name="endPoints" updates="None" val="[0, 1]" valType="num"/>
+      <Param name="isTrials" updates="None" val="False" valType="bool"/>
+      <Param name="loopType" updates="None" val="random" valType="str"/>
+      <Param name="nReps" updates="None" val="1" valType="num"/>
+      <Param name="name" updates="None" val="lastLoop" valType="code"/>
+      <Param name="random seed" updates="None" val="" valType="code"/>
+    </LoopInitiator>
     <LoopInitiator loopType="TrialHandler" name="blockTrials">
       <Param name="Selected rows" updates="None" val="" valType="str"/>
       <Param name="conditions" updates="None" val="None" valType="str"/>
@@ -1207,6 +1276,7 @@
     <LoopTerminator name="blockTrials2"/>
     <Routine name="stopEye"/>
     <LoopTerminator name="breakLoop"/>
+    <LoopTerminator name="lastLoop"/>
     <Routine name="complete"/>
   </Flow>
 </PsychoPy2experiment>
