@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2024.2.4),
-    on Fri May 30 19:35:14 2025
+    on Wed Jun  4 12:26:45 2025
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -442,44 +442,44 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     # --- Initialize components for Routine "blockSetup" ---
     
     # --- Initialize components for Routine "trial" ---
-    stimulusWhite1 = visual.Rect(
+    stimulusWhite1 = visual.ShapeStim(
         win=win, name='stimulusWhite1',
-        width=(50, 50)[0], height=(50, 50)[1],
+        size=(5, 5), vertices='circle',
         ori=0.0, pos=(0, 0), draggable=False, anchor='center',
         lineWidth=1.0,
         colorSpace='rgb', lineColor='white', fillColor='white',
         opacity=None, depth=0.0, interpolate=True)
-    stimulusWhite2 = visual.Rect(
+    stimulusWhite2 = visual.ShapeStim(
         win=win, name='stimulusWhite2',
-        width=(50, 50)[0], height=(50, 50)[1],
+        size=(5, 5), vertices='circle',
         ori=0.0, pos=(0, 0), draggable=False, anchor='center',
         lineWidth=1.0,
         colorSpace='rgb', lineColor='white', fillColor='white',
         opacity=None, depth=-1.0, interpolate=True)
-    stimulusWhite3 = visual.Rect(
+    stimulusWhite3 = visual.ShapeStim(
         win=win, name='stimulusWhite3',
-        width=(50, 50)[0], height=(50, 50)[1],
+        size=(5, 5), vertices='circle',
         ori=0.0, pos=(0, 0), draggable=False, anchor='center',
         lineWidth=1.0,
         colorSpace='rgb', lineColor='white', fillColor='white',
         opacity=None, depth=-2.0, interpolate=True)
-    stimulusWhite4 = visual.Rect(
+    stimulusWhite4 = visual.ShapeStim(
         win=win, name='stimulusWhite4',
-        width=(50, 50)[0], height=(50, 50)[1],
+        size=(5, 5), vertices='circle',
         ori=0.0, pos=(0, 0), draggable=False, anchor='center',
         lineWidth=1.0,
         colorSpace='rgb', lineColor='white', fillColor='white',
         opacity=None, depth=-3.0, interpolate=True)
-    stimulusWhite5 = visual.Rect(
+    stimulusWhite5 = visual.ShapeStim(
         win=win, name='stimulusWhite5',
-        width=(50, 50)[0], height=(50, 50)[1],
+        size=(5, 5), vertices='circle',
         ori=0.0, pos=(0, 0), draggable=False, anchor='center',
         lineWidth=1.0,
         colorSpace='rgb', lineColor='white', fillColor='white',
         opacity=None, depth=-4.0, interpolate=True)
-    stimulusWhite6 = visual.Rect(
+    stimulusWhite6 = visual.ShapeStim(
         win=win, name='stimulusWhite6',
-        width=(50, 50)[0], height=(50, 50)[1],
+        size=(5, 5), vertices='circle',
         ori=0.0, pos=(0, 0), draggable=False, anchor='center',
         lineWidth=1.0,
         colorSpace='rgb', lineColor='white', fillColor='white',
@@ -503,27 +503,20 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     # --- Initialize components for Routine "testRoutine" ---
     respKeyPress = keyboard.Keyboard(deviceName='respKeyPress')
     respKeyRelease = keyboard.Keyboard(deviceName='respKeyRelease')
-    testPhase = visual.Rect(
-        win=win, name='testPhase',
-        width=(50, 50)[0], height=(50, 50)[1],
-        ori=0.0, pos=(0, 0), draggable=False, anchor='center',
-        lineWidth=1.0,
-        colorSpace='rgb', lineColor='white', fillColor=[-1.0000, -1.0000, -1.0000],
-        opacity=None, depth=-2.0, interpolate=True)
-    responseGreen = visual.Rect(
+    responseGreen = visual.ShapeStim(
         win=win, name='responseGreen',
-        width=(50, 50)[0], height=(50, 50)[1],
+        size=(5, 5), vertices='circle',
         ori=0.0, pos=(0, 0), draggable=False, anchor='center',
         lineWidth=1.0,
         colorSpace='rgb', lineColor='white', fillColor=[-1.0000, 1.0000, -1.0000],
-        opacity=0.0, depth=-4.0, interpolate=True)
+        opacity=0.0, depth=-3.0, interpolate=True)
     fixationRedTest = visual.ShapeStim(
         win=win, name='fixationRedTest',
         size=(0.5, 0.5), vertices='circle',
         ori=0.0, pos=(0, 0), draggable=False, anchor='center',
         lineWidth=1.0,
         colorSpace='rgb', lineColor=[1.0000, -1.0000, -1.0000], fillColor=[1.0000, -1.0000, -1.0000],
-        opacity=None, depth=-5.0, interpolate=True)
+        opacity=None, depth=-4.0, interpolate=True)
     
     # --- Initialize components for Routine "feedbackRoutine" ---
     stimBar = visual.Rect(
@@ -1031,7 +1024,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         # set up handler to look after randomisation of conditions etc
         trialBlock = data.TrialHandler2(
             name='trialBlock',
-            nReps=2.0, 
+            nReps=4.0, 
             method='random', 
             extraInfo=expInfo, 
             originPath=-1, 
@@ -1062,7 +1055,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             # set up handler to look after randomisation of conditions etc
             trials = data.TrialHandler2(
                 name='trials',
-                nReps=2.0, 
+                nReps=15.0, 
                 method='random', 
                 extraInfo=expInfo, 
                 originPath=-1, 
@@ -1400,6 +1393,9 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                         statusText.text = ''
                     statusText.text = 'Press spacebar and reproduce the pattern.'
                     
+                    thisExp.addData('speed',speed)
+                    thisExp.addData('startTimes',startTimes)
+                    
                     # *key_resp* updates
                     waitOnFlip = False
                     
@@ -1419,7 +1415,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                         win.callOnFlip(key_resp.clock.reset)  # t=0 on next screen flip
                         win.callOnFlip(key_resp.clearEvents, eventType='keyboard')  # clear events on next screen flip
                     if key_resp.status == STARTED and not waitOnFlip:
-                        theseKeys = key_resp.getKeys(keyList=['space'], ignoreKeys=["escape"], waitRelease=True)
+                        theseKeys = key_resp.getKeys(keyList=['space'], ignoreKeys=["escape"], waitRelease=False)
                         _key_resp_allKeys.extend(theseKeys)
                         if len(_key_resp_allKeys):
                             key_resp.keys = _key_resp_allKeys[-1].name  # just the last key pressed
@@ -1481,7 +1477,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                 # create an object to store info about Routine testRoutine
                 testRoutine = data.Routine(
                     name='testRoutine',
-                    components=[respKeyPress, respKeyRelease, testPhase, responseGreen, fixationRedTest],
+                    components=[respKeyPress, respKeyRelease, responseGreen, fixationRedTest],
                 )
                 testRoutine.status = NOT_STARTED
                 continueRoutine = True
@@ -1531,7 +1527,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     waitOnFlip = False
                     
                     # if respKeyPress is starting this frame...
-                    if respKeyPress.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+                    if respKeyPress.status == NOT_STARTED and tThisFlip >= 0-frameTolerance:
                         # keep track of start time/frame for later
                         respKeyPress.frameNStart = frameN  # exact frame index
                         respKeyPress.tStart = t  # local t and not account for scr refresh
@@ -1571,7 +1567,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     waitOnFlip = False
                     
                     # if respKeyRelease is starting this frame...
-                    if respKeyRelease.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+                    if respKeyRelease.status == NOT_STARTED and tThisFlip >= 0-frameTolerance:
                         # keep track of start time/frame for later
                         respKeyRelease.frameNStart = frameN  # exact frame index
                         respKeyRelease.tStart = t  # local t and not account for scr refresh
@@ -1606,59 +1602,22 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                             respKeyRelease.keys = [key.name for key in _respKeyRelease_allKeys]  # storing all keys
                             respKeyRelease.rt = [key.rt for key in _respKeyRelease_allKeys]
                             respKeyRelease.duration = [key.duration for key in _respKeyRelease_allKeys]
-                    
-                    # *testPhase* updates
-                    
-                    # if testPhase is starting this frame...
-                    if testPhase.status == NOT_STARTED and tThisFlip >= 0-frameTolerance:
-                        # keep track of start time/frame for later
-                        testPhase.frameNStart = frameN  # exact frame index
-                        testPhase.tStart = t  # local t and not account for scr refresh
-                        testPhase.tStartRefresh = tThisFlipGlobal  # on global time
-                        win.timeOnFlip(testPhase, 'tStartRefresh')  # time at next scr refresh
-                        # add timestamp to datafile
-                        thisExp.timestampOnFlip(win, 'testPhase.started')
-                        # update status
-                        testPhase.status = STARTED
-                        testPhase.setAutoDraw(True)
-                    
-                    # if testPhase is active this frame...
-                    if testPhase.status == STARTED:
-                        # update params
-                        pass
-                    
-                    # if testPhase is stopping this frame...
-                    if testPhase.status == STARTED:
-                        # is it time to stop? (based on global clock, using actual start)
-                        if tThisFlipGlobal > testPhase.tStartRefresh + startTimes[5]+0.025+2-frameTolerance:
-                            # keep track of stop time/frame for later
-                            testPhase.tStop = t  # not accounting for scr refresh
-                            testPhase.tStopRefresh = tThisFlipGlobal  # on global time
-                            testPhase.frameNStop = frameN  # exact frame index
-                            # add timestamp to datafile
-                            thisExp.timestampOnFlip(win, 'testPhase.stopped')
-                            # update status
-                            testPhase.status = FINISHED
-                            testPhase.setAutoDraw(False)
                     # Run 'Each Frame' code from testCode
-                     
-                    # Show stimulus only if key is held
-                    if len(respKeyRelease.keys)<len(respKeyPress.keys):
-                        responseGreen.opacity = 1
+                    if len(respKeyRelease.keys)>len(respKeyPress.keys):
+                        responseGreen.opacity = 0
                         win.flip()
                     else:
-                        responseGreen.opacity = 0 
+                        responseGreen.opacity = 1
                         win.flip()
                         
-                    if len(respKeyRelease.keys) == 5:
+                    if len(respKeyPress.keys) == 5:
                         continueRoutine = False
-                    # Small delay to prevent maxing CPU
-                    #core.wait(0.01)
+                    
                     
                     # *responseGreen* updates
                     
                     # if responseGreen is starting this frame...
-                    if responseGreen.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+                    if responseGreen.status == NOT_STARTED and tThisFlip >= 0-frameTolerance:
                         # keep track of start time/frame for later
                         responseGreen.frameNStart = frameN  # exact frame index
                         responseGreen.tStart = t  # local t and not account for scr refresh
@@ -1931,7 +1890,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                         win.callOnFlip(feedbackResp.clock.reset)  # t=0 on next screen flip
                         win.callOnFlip(feedbackResp.clearEvents, eventType='keyboard')  # clear events on next screen flip
                     if feedbackResp.status == STARTED and not waitOnFlip:
-                        theseKeys = feedbackResp.getKeys(keyList=['space'], ignoreKeys=["escape"], waitRelease=True)
+                        theseKeys = feedbackResp.getKeys(keyList=['space'], ignoreKeys=["escape"], waitRelease=False)
                         _feedbackResp_allKeys.extend(theseKeys)
                         if len(_feedbackResp_allKeys):
                             feedbackResp.keys = _feedbackResp_allKeys[-1].name  # just the last key pressed
@@ -2248,7 +2207,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     trials.addData('feedbackResp.duration', feedbackResp.duration)
                 # the Routine "feedbackRoutine" was not non-slip safe, so reset the non-slip timer
                 routineTimer.reset()
-            # completed 2.0 repeats of 'trials'
+            # completed 15.0 repeats of 'trials'
             
             
             # --- Prepare to start Routine "breakRoutine" ---
@@ -2336,7 +2295,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     win.callOnFlip(breakResp.clock.reset)  # t=0 on next screen flip
                     win.callOnFlip(breakResp.clearEvents, eventType='keyboard')  # clear events on next screen flip
                 if breakResp.status == STARTED and not waitOnFlip:
-                    theseKeys = breakResp.getKeys(keyList=['space'], ignoreKeys=["escape"], waitRelease=True)
+                    theseKeys = breakResp.getKeys(keyList=['space'], ignoreKeys=["escape"], waitRelease=False)
                     _breakResp_allKeys.extend(theseKeys)
                     if len(_breakResp_allKeys):
                         breakResp.keys = _breakResp_allKeys[-1].name  # just the last key pressed
@@ -2395,7 +2354,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             routineTimer.reset()
             thisExp.nextEntry()
             
-        # completed 2.0 repeats of 'trialBlock'
+        # completed 4.0 repeats of 'trialBlock'
         
         if thisSession is not None:
             # if running in a Session with a Liaison client, send data up to now
