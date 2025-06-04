@@ -71,7 +71,7 @@
     <Param val="1000" valType="num" updates="None" name="plPupilRemoteTimeoutMs"/>
     <Param val="False" valType="bool" updates="None" name="plPupillometryOnly"/>
     <Param val="psychopy_iohub_surface" valType="str" updates="None" name="plSurfaceName"/>
-    <Param val="0" valType="code" updates="None" name="runMode"/>
+    <Param val="1" valType="code" updates="None" name="runMode"/>
     <Param val="False" valType="bool" updates="None" name="rush"/>
     <Param val="time" valType="str" updates="None" name="sortColumns"/>
     <Param val="" valType="str" updates="None" name="tbLicenseFile"/>
@@ -867,7 +867,7 @@
         <Param val="False" valType="bool" updates="constant" name="storeCorrect"/>
         <Param val="True" valType="bool" updates="constant" name="syncScreenRefresh"/>
       </KeyboardComponent>
-      <CodeComponent name="startClock" plugin="None">
+      <CodeComponent name="setupLMs" plugin="None">
         <Param val="" valType="extendedCode" updates="constant" name="Before Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="Before JS Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="Begin Experiment"/>
@@ -882,7 +882,7 @@
         <Param val="" valType="extendedCode" updates="constant" name="End JS Routine"/>
         <Param val="" valType="extendedCode" updates="constant" name="End Routine"/>
         <Param val="False" valType="bool" updates="None" name="disabled"/>
-        <Param val="startClock" valType="code" updates="None" name="name"/>
+        <Param val="setupLMs" valType="code" updates="None" name="name"/>
       </CodeComponent>
     </Routine>
     <Routine name="stopEye">
@@ -1017,10 +1017,10 @@
       <CodeComponent name="expSetup_env" plugin="None">
         <Param val="# import libraries&amp;#10;import random&amp;#10;from psychopy import event&amp;#10;#defining global variables&amp;#10;&amp;#10;experimentExpired = False" valType="extendedCode" updates="constant" name="Before Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="Before JS Experiment"/>
-        <Param val="&amp;#10;&amp;#10;## Environment variables start&amp;#10;imageset=1 # Image set&amp;#10;landmarkWidth = 5 #Landmark width in degrees&amp;#10;landmarkHeight = 5 #Landmark height in degrees&amp;#10;startLandmarkY = 4# Y position of start Landmark in degrees&amp;#10;targetLandmarkY =  -4# Y position of target Landmark in degrees&amp;#10;interLandmarkDistance = 5# Distance between two neighboring landmarks in degrees&amp;#10;trainingStepSizes = [1,1.5]#speed of landmarks during training in terms of degrees per frame&amp;#10;testingStepSizes = [0.5,0.66,1,1.25,1.5,2]#speed of landmarks during testing in terms of degrees per frame&amp;#10;numLandmarks = 7 # Total number of Landmarks&amp;#10;tolerance = 0.25# Amount of permissible error while matching target and start Landmark&amp;#10;initialTrials = 100# Number of trails as visual for day 2&amp;#10;stopKey = &quot;s&quot; # A key to stop the experiment at anypoint and then save the data&amp;#10;nDots = 100 # Number of white dots in background at any one frame&amp;#10;fixationSize = (0.5,0.5) # Size of fixation dot in degree&amp;#10;#dotRadius = # Size of white dots in background&amp;#10;dotLife = 60 # Number of frames a particular dot will be shown&amp;#10;blockSize = 2 #15 # Block is collection of Trials. Number of trials in a block&amp;#10;#screenHeight = # Height of screen in cm&amp;#10;#objectDistance = # Distance from the eye to the screen in cm&amp;#10;edgeLandmarkDistance = 12.5 # maximum distance of edge landmarks from the center&amp;#10;totalTime = 1*60 # total time before the experiment ends automatically &amp;#10;score = 0&amp;#10;currentTrialDD = 0  &amp;#10;devMode = True&amp;#10;## Environment variables end&amp;#10;&amp;#10;dt = 0.167 # distance between lms is 10deg; this step size is for 10 deg/sec at 60 fps&amp;#10;#defining global variables&amp;#10;targetReached = False&amp;#10;experimentExpired = False&amp;#10;isTrain = True &amp;#10;loopName = &quot;blockTrials&quot;&amp;#10;seed = random.randint(0,9999)&amp;#10;&amp;#10;random.seed(42)&amp;#10;&amp;#10;#Build distance-to-pairs dictionary&amp;#10;all_distance_to_pairs = {&amp;#10;    k: [(i, j) for i in range(numLandmarks) for j in range(numLandmarks)&amp;#10;        if abs(i - j) == k]&amp;#10;    for k in range(1, numLandmarks)&amp;#10;}&amp;#10;&amp;#10;#Select half of the pairs for training&amp;#10;training_pairs = {}&amp;#10;&amp;#10;for k, pairs in all_distance_to_pairs.items():&amp;#10;    shuffled = pairs.copy()&amp;#10;    random.shuffle(shuffled)&amp;#10;    half_n = len(shuffled) // 2&amp;#10;    training_pairs[k] = shuffled[:half_n]&amp;#10;" valType="extendedCode" updates="constant" name="Begin Experiment"/>
+        <Param val="&amp;#10;&amp;#10;## Environment variables start&amp;#10;imageset=1 # Image set&amp;#10;landmarkWidth = 5 #Landmark width in degrees&amp;#10;landmarkHeight = 5 #Landmark height in degrees&amp;#10;startLandmarkY = 4# Y position of start Landmark in degrees&amp;#10;targetLandmarkY =  -4# Y position of target Landmark in degrees&amp;#10;interLandmarkDistance = 5# Distance between two neighboring landmarks in degrees&amp;#10;trainingStepSizes = [1,1.5]#speed of landmarks during training in terms of degrees per frame&amp;#10;testingStepSizes = [0.5,0.66,1,1.25,1.5,2]#speed of landmarks during testing in terms of degrees per frame&amp;#10;numLandmarks = 7 # Total number of Landmarks&amp;#10;tolerance = 0.25# Amount of permissible error while matching target and start Landmark&amp;#10;initialTrials = 100# Number of trails as visual for day 2&amp;#10;stopKey = &quot;s&quot; # A key to stop the experiment at anypoint and then save the data&amp;#10;nDots = 100 # Number of white dots in background at any one frame&amp;#10;fixationSize = (0.5,0.5) # Size of fixation dot in degree&amp;#10;nIter = 10 # number of iteration of second part of the exp  &amp;#10;#dotRadius = # Size of white dots in background&amp;#10;dotLife = 60 # Number of frames a particular dot will be shown&amp;#10;blockSize = 15 #15 # Block is collection of Trials. Number of trials in a block&amp;#10;#screenHeight = # Height of screen in cm&amp;#10;#objectDistance = # Distance from the eye to the screen in cm&amp;#10;edgeLandmarkDistance = 12.5 # maximum distance of edge landmarks from the center&amp;#10;totalTime = 5*60 # total time before the experiment ends automatically &amp;#10;score = 0&amp;#10;currentTrialDD = 0  &amp;#10;devMode = False&amp;#10;## Environment variables end&amp;#10;&amp;#10;dt = 0.167 # distance between lms is 10deg; this step size is for 10 deg/sec at 60 fps&amp;#10;#defining global variables&amp;#10;targetReached = False&amp;#10;experimentExpired = False&amp;#10;isTrain = True &amp;#10;loopName = &quot;blockTrials&quot;&amp;#10;seed = random.randint(0,9999)&amp;#10;&amp;#10;random.seed(42)&amp;#10;&amp;#10;#Build distance-to-pairs dictionary&amp;#10;all_distance_to_pairs = {&amp;#10;    k: [(i, j) for i in range(numLandmarks) for j in range(numLandmarks)&amp;#10;        if abs(i - j) == k]&amp;#10;    for k in range(1, numLandmarks)&amp;#10;}&amp;#10;&amp;#10;#Select half of the pairs for training&amp;#10;training_pairs = {}&amp;#10;&amp;#10;for k, pairs in all_distance_to_pairs.items():&amp;#10;    shuffled = pairs.copy()&amp;#10;    random.shuffle(shuffled)&amp;#10;    half_n = len(shuffled) // 2&amp;#10;    training_pairs[k] = shuffled[:half_n]&amp;#10;" valType="extendedCode" updates="constant" name="Begin Experiment"/>
         <Param val="t" valType="extendedCode" updates="constant" name="Begin JS Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="Begin JS Routine"/>
-        <Param val="# generarte a list of distances&amp;#10;allDistances = list(range(1,numLandmarks))&amp;#10;# two list of distances for two block modes&amp;#10;distances1 = [random.choice(allDistances) for _ in range(blockSize*6)]&amp;#10;distances2 =  [random.choice(allDistances) for  _ in range(500)]&amp;#10;# sampling from distance for two block modes&amp;#10;pairs1 = [random.choice(training_pairs[distance]) for distance in distances1]&amp;#10;pairs2 = [random.choice(training_pairs[distance]) for distance in distances2]&amp;#10;# merge the pairs&amp;#10;allPairs = pairs1+pairs2&amp;#10;# randomizing pairs &amp;#10;random.seed(None)&amp;#10;random.shuffle(allPairs)&amp;#10;&amp;#10;# each block within a block mode  has different speed and visual mode&amp;#10;speedOptions = [1,1.5,1.5,1.5,1,1]&amp;#10;#speedOptions = [0.5,0.66,1,1.25,1.5,2]&amp;#10;visualModeOptions = [True,False,False,True,True,False]" valType="extendedCode" updates="constant" name="Begin Routine"/>
+        <Param val="# each block within a block mode  has different speed and visual mode&amp;#10;speedOptions = [1,1.5,1.5,1.5,1,1]&amp;#10;#speedOptions = [0.5,0.66,1,1.25,1.5,2]&amp;#10;visualModeOptions = [True,True,False,True,True,False]&amp;#10;&amp;#10;# generarte a list of distances&amp;#10;allDistances = list(range(1,numLandmarks))&amp;#10;# two list of distances for two block modes&amp;#10;distances1 = [random.choice(allDistances) for _ in range(blockSize*len(speedOptions))]&amp;#10;distances2 =  [random.choice(allDistances) for  _ in range(len(speedOptions)*nIter*blockSize)]&amp;#10;# sampling from distance for two block modes&amp;#10;pairs1 = [random.choice(training_pairs[distance]) for distance in distances1]&amp;#10;pairs2 = [random.choice(training_pairs[distance]) for distance in distances2]&amp;#10;# merge the pairs&amp;#10;allPairs = pairs1+pairs2&amp;#10;print(&quot;Length of trials&quot;,len(pairs1),len(pairs2))&amp;#10;# randomizing pairs &amp;#10;random.seed(None)&amp;#10;random.shuffle(allPairs)&amp;#10;&amp;#10;random.seed(42)&amp;#10;trainingSpeeds = [s for _ in range(nIter) for s in trainingStepSizes]&amp;#10;print(&quot;ts&quot;,trainingSpeeds)&amp;#10;random.shuffle(trainingSpeeds)&amp;#10;&amp;#10;&amp;#10;&amp;#10;" valType="extendedCode" updates="constant" name="Begin Routine"/>
         <Param val="Py" valType="str" updates="None" name="Code Type"/>
         <Param val="" valType="extendedCode" updates="constant" name="Each Frame"/>
         <Param val="" valType="extendedCode" updates="constant" name="Each JS Frame"/>
@@ -1082,7 +1082,7 @@
         <Param val="" valType="extendedCode" updates="constant" name="Begin Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="Begin JS Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="Begin JS Routine"/>
-        <Param val="visualMode =True&amp;#10;loopName =  &quot;breakLoop&quot;&amp;#10;&amp;#10;random.seed(42)&amp;#10;trainingSpeeds = [s for _ in range(10) for s in testingStepSizes]&amp;#10;random.shuffle(trainingSpeeds)&amp;#10;&amp;#10;&amp;#10;if 'experimentExpired' in globals() and experimentExpired:&amp;#10;    print('dont run breakloop')&amp;#10;    continueRoutine = False    &amp;#10;    breakLoop.finished = True&amp;#10;    break" valType="extendedCode" updates="constant" name="Begin Routine"/>
+        <Param val="visualMode =True&amp;#10;loopName =  &quot;breakLoop&quot;&amp;#10;&amp;#10;if 'experimentExpired' in globals() and experimentExpired:&amp;#10;    print('dont run breakloop')&amp;#10;    continueRoutine = False    &amp;#10;    breakLoop.finished = True&amp;#10;    break" valType="extendedCode" updates="constant" name="Begin Routine"/>
         <Param val="Py" valType="str" updates="None" name="Code Type"/>
         <Param val="" valType="extendedCode" updates="constant" name="Each Frame"/>
         <Param val="" valType="extendedCode" updates="constant" name="Each JS Frame"/>
@@ -1294,6 +1294,41 @@
         <Param val="True" valType="bool" updates="constant" name="syncScreenRefresh"/>
       </KeyboardComponent>
     </Routine>
+    <Routine name="blockSetup2">
+      <RoutineSettingsComponent name="blockSetup2" plugin="None">
+        <Param val="none" valType="str" updates="None" name="backgroundFit"/>
+        <Param val="" valType="str" updates="None" name="backgroundImg"/>
+        <Param val="$[0,0,0]" valType="color" updates="None" name="color"/>
+        <Param val="rgb" valType="str" updates="None" name="colorSpace"/>
+        <Param val="" valType="str" updates="constant" name="desc"/>
+        <Param val="False" valType="bool" updates="None" name="disabled"/>
+        <Param val="" valType="code" updates="None" name="durationEstim"/>
+        <Param val="False" valType="code" updates="None" name="forceNonSlip"/>
+        <Param val="blockSetup2" valType="code" updates="None" name="name"/>
+        <Param val="True" valType="bool" updates="None" name="saveStartStop"/>
+        <Param val="" valType="code" updates="constant" name="skipIf"/>
+        <Param val="duration (s)" valType="str" updates="None" name="stopType"/>
+        <Param val="" valType="code" updates="constant" name="stopVal"/>
+        <Param val="False" valType="bool" updates="None" name="useWindowParams"/>
+      </RoutineSettingsComponent>
+      <CodeComponent name="block2SetupCode" plugin="None">
+        <Param val="" valType="extendedCode" updates="constant" name="Before Experiment"/>
+        <Param val="" valType="extendedCode" updates="constant" name="Before JS Experiment"/>
+        <Param val="" valType="extendedCode" updates="constant" name="Begin Experiment"/>
+        <Param val="" valType="extendedCode" updates="constant" name="Begin JS Experiment"/>
+        <Param val="" valType="extendedCode" updates="constant" name="Begin JS Routine"/>
+        <Param val="speed = trainingSpeeds[blockTrials2.thisN]" valType="extendedCode" updates="constant" name="Begin Routine"/>
+        <Param val="Py" valType="str" updates="None" name="Code Type"/>
+        <Param val="" valType="extendedCode" updates="constant" name="Each Frame"/>
+        <Param val="" valType="extendedCode" updates="constant" name="Each JS Frame"/>
+        <Param val="" valType="extendedCode" updates="constant" name="End Experiment"/>
+        <Param val="" valType="extendedCode" updates="constant" name="End JS Experiment"/>
+        <Param val="" valType="extendedCode" updates="constant" name="End JS Routine"/>
+        <Param val="" valType="extendedCode" updates="constant" name="End Routine"/>
+        <Param val="False" valType="bool" updates="None" name="disabled"/>
+        <Param val="block2SetupCode" valType="code" updates="None" name="name"/>
+      </CodeComponent>
+    </Routine>
   </Routines>
   <Flow>
     <Routine name="welcome"/>
@@ -1373,11 +1408,11 @@
       <Param name="endPoints" updates="None" val="[0, 1]" valType="num"/>
       <Param name="isTrials" updates="None" val="True" valType="bool"/>
       <Param name="loopType" updates="None" val="random" valType="str"/>
-      <Param name="nReps" updates="None" val="5" valType="num"/>
+      <Param name="nReps" updates="None" val="12" valType="num"/>
       <Param name="name" updates="None" val="blockTrials2" valType="code"/>
       <Param name="random seed" updates="None" val="" valType="code"/>
     </LoopInitiator>
-    <Routine name="blockSetup"/>
+    <Routine name="blockSetup2"/>
     <LoopInitiator loopType="TrialHandler" name="trials2">
       <Param name="Selected rows" updates="None" val="" valType="str"/>
       <Param name="conditions" updates="None" val="None" valType="str"/>
@@ -1385,7 +1420,7 @@
       <Param name="endPoints" updates="None" val="[0, 1]" valType="num"/>
       <Param name="isTrials" updates="None" val="True" valType="bool"/>
       <Param name="loopType" updates="None" val="random" valType="str"/>
-      <Param name="nReps" updates="None" val="10" valType="num"/>
+      <Param name="nReps" updates="None" val="15" valType="num"/>
       <Param name="name" updates="None" val="trials2" valType="code"/>
       <Param name="random seed" updates="None" val="" valType="code"/>
     </LoopInitiator>
