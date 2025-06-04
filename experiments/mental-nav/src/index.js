@@ -24,9 +24,11 @@ import {
   InstructionsPanel,
   CSS2D,
 } from 'ouvrai';
+
 import { fileContents } from './fileContents.js';
 import { sampleDelay,randomUniform } from './utils.js';
-import { degToRad, radToDeg } from 'three/src/math/MathUtils.js';
+import { radToDeg } from 'three/src/math/MathUtils.js';
+
 /*
  * Main function contains all experiment logic. At a minimum you should:
  * 1. Create a `new Experiment({...config})`
@@ -35,34 +37,12 @@ import { degToRad, radToDeg } from 'three/src/math/MathUtils.js';
  * 4. Create trial sequence with `exp.createTrialSequence([...blocks])`
  * 5. Start the main loop with `exp.start(calcFunc, stateFunc, displayFunc)`
  * 6. Design your experiment by editing `calcFunc`, `stateFunc`, and `displayFunc`
- */
-
-
-function worldToPixel(worldPosition, camera, screenWidth, screenHeight) {
-  // Convert world position to NDC
-  const ndc = worldToNDC(worldPosition, camera);
-  
-  // Convert NDC to screen coordinates
-  return ndcToScreen(ndc, screenWidth, screenHeight);
-}
-
-function worldToNDC(worldPosition, camera) {
-  const vector = new Vector3();
-  vector.copy(worldPosition).project(camera);
-  return vector;
-}
+*/
 
 function pixelToNDCSize(pixelSize) {
   // Convert pixelX to NDC x
   return (pixelSize / window.innerHeight) * 2;
   
-}
-
-function ndcToScreen(ndc, screenWidth, screenHeight) {
-
-  const x = (ndc.x + 1) / 2 * screenWidth;
-  const y = (-ndc.y + 1) / 2 * screenHeight; // Y is inverted
-  return { x, y };
 }
 
 function vaToPixels(angleDegrees, distance, screenHeightcm) {
@@ -83,16 +63,6 @@ function vaToNdC(angleDegrees,distance,screenHeightcm){
   return ndc;
 }
 
-function ndcToVA(ndc,distance,screenHeightcm){
-  const dpp =  radToDeg(Math.atan2(0.5 * screenHeightcm, distance)) / (0.5 * window.innerHeight); //degree per pixel
-  
-  const pixels = ((ndc+1)/2)* window.innerHeight;
-  
-  const va = pixels * dpp;
-  
-  return pixels;
-}
-
 async function main() {
   /*
    * The first step is always to create a new Experiment({...config}) with your configuration options.
@@ -100,7 +70,6 @@ async function main() {
    * You can also provide other experiment-level variables here as additional fields.
    * All values in the configuration object will be saved in your data.
    * You can add variables throughout the experiment using `exp.cfg.VARNAME = VALUE`.
-
 */
 
 // Example usage
@@ -647,7 +616,7 @@ function setRandomPosition(dot){
           exp.state.next('START');
         }
 // Set the speed for the trial (it will be the same for the next 15 trials)
-
+        
         break;
 
       case 'START':
@@ -690,6 +659,10 @@ function setRandomPosition(dot){
           overlayText.element.innerText = '';
           exp.state.next('INITIAL');
         }
+
+        
+
+
         break;
       
         case 'INITIAL':
@@ -734,8 +707,10 @@ function setRandomPosition(dot){
           //  \n STEP: ${trial.stepSize} TN: ${trial.trialNumber} Attempt:${trial.attempt}`;
           // overlayText.element.innerText = `SESSION TYPE: ${exp.cfg.searchParams.get('DAY')} `
           target.visible = true;
+          
           console.log(trial.isTrain);
         });
+        
 
         mask.visible = false;
         mask2.visible = false;
@@ -777,26 +752,31 @@ function setRandomPosition(dot){
 
         landmarks.forEach(lm=>lm.visible=trial.isTrain)
         }
+        if (trial.attempt>1){
+          exp.state.next('FINISH')
+        }
         break;
 
       case 'STOP':
-        exp.state.once(() => {              
-          trial.producedTime = performance.now() - trial.keyDown;
-          console.log('produced Time',trial.producedTime);
-          console.log('true Time',trial.trueTime);
-          
+        exp.state.once(() => {  
           if (!trial.isTrain){
             landmarks.filter(l=>(l.position.x>-0.7)||(l.position.x<0.7)).forEach(l=>{l.visible=true})
           }
         target.visible= true;
         if (target.reached) {
           if (trial.attempt === 1){
+            
             exp.cfg.score += 1;
           }
           if (exp.state.expired(sampleDelay(0.5,1.5))){
             exp.state.next('FINISH')
           } 
         }
+
+        if (trial.attempt>1){
+          exp.state.next('FINISH')
+        }
+
         if (trial.isTrain){
           landmarks.forEach(l=>{l.visible=true})}
         else{
@@ -809,6 +789,16 @@ function setRandomPosition(dot){
         
 
         });
+
+        if (trial.attempt==1){
+        trial.producedTime = performance.now() - trial.keyDown;
+        console.log('produced Time',trial.producedTime);
+        console.log('true Time',trial.trueTime);
+        console.log("current attempt",trial.attempt)
+      }else{
+        exp.state.next('FINISH')
+
+      }
 
         handleFrameData();
         if (!cursor.atHome) {
@@ -825,7 +815,6 @@ function setRandomPosition(dot){
               } 
             }
             else{
-              // if (exp.cfg.searchParams.get('DAY')<3){ // for trainingg days
                 if (trial.attempt>1){  // show the  target and current  positiion
                   target.visible = true;
                   if(exp.state.expired(sampleDelay(0.5,1.5))){                  
@@ -833,11 +822,6 @@ function setRandomPosition(dot){
                     exp.state.next('FINISH')
                   }
                 }
-              // }else{
-                // if (exp.state.expired(sampleDelay(0.5,1.5))){ //other days  go to finish
-                //     exp.state.next('FINISH')
-                //   }
-              // }
             }
           if (moveLeft.lm||moveRight.lm) {
             trial.attempt +=1;
@@ -924,6 +908,7 @@ function setRandomPosition(dot){
    * Compute and update stimulus and UI presentation.
    */
   function displayFunc() {
+    
     // Set the color of the home position material
     home.material.color = new Color(
       cursor.atHome ? 'hsl(116, 0%, 50%)' : 'hsl(0, 0%, 100%)'
@@ -974,6 +959,11 @@ function setRandomPosition(dot){
   }
 
 function handleKeyDown(e) {
+  if (trial.attempt>1){
+   console.log("stopped") 
+   return
+  }
+
   isKeyDown = true;
   
   const keyActions = {
@@ -987,6 +977,7 @@ function handleKeyDown(e) {
 
   if (exp.state.between("GO", "FINISH") && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
     keyActions[e.key]();
+    console.log("pressed key")
   }
 
   if (e.key === config.stopKey) {
@@ -1000,7 +991,6 @@ function handleKeyDown(e) {
   let deltaTime = clock.getDelta();  // Time elapsed since last frame in seconds  
   // Define the step size that should occur over 1 second
   const stepPerSecond = Math.abs(vaToNdC(trial.stepSize, objectDistance, config.screenHeightcm));
-  
   // Adjust the step for the current frame based on deltaTime
   const step = stepPerSecond * deltaTime ; // Movement per frame
   
@@ -1033,6 +1023,7 @@ function handleKeyDown(e) {
     }}
 })
 }
+
 animate();
 
 // Record frame data
